@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "parser/parser.h"
+#include "parser/heading_corrector.h"
 #include "renderer/renderer.h"
 
 namespace fs = std::filesystem;
@@ -14,7 +15,7 @@ namespace fs = std::filesystem;
 namespace minissg
 {
 
-void build(const SiteConfig& config)
+void build(const SiteConfig& config, bool fixHeadings, bool autoNumber)
 {
     fs::create_directories(config.outputDir);
 
@@ -44,6 +45,8 @@ void build(const SiteConfig& config)
         std::cout << "Parsing: " << path << std::endl;
 
         auto art = parseArticle(path);
+        if (fixHeadings)
+            art.htmlContent = correctHeadings(art.htmlContent, path, autoNumber);
 
         // 从相对路径提取分类目录名
         std::string rel = fs::relative(entry.path(), srcRoot).string();

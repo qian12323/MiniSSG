@@ -1,6 +1,8 @@
 #include "cli/cli.h"
 
 #include <CLI/CLI.hpp>
+#include <cstring>
+#include "builder/builder.h"
 
 namespace minissg
 {
@@ -9,14 +11,28 @@ namespace cli
 
 int run(int argc, char* argv[])
 {
+    // 先提取 config 路径，加载配置作为 CLI 默认值
+    std::string configPath = "config.yaml";
+    for (int i = 1; i < argc; ++i)
+    {
+        if ((std::strcmp(argv[i], "-c") == 0 || std::strcmp(argv[i], "--config") == 0)
+            && i + 1 < argc)
+        {
+            configPath = argv[++i];
+            break;
+        }
+    }
+    auto cfg = loadConfig(configPath);
+
     CLI::App app{"MiniSSG - A minimal static site generator"};
 
-    std::string configPath = "config.yaml";
     app.add_option("-c,--config", configPath, "Config file path")->capture_default_str();
     app.fallthrough();
 
     auto* buildCmd = app.add_subcommand("build", "Build the site");
-    buildCmd->callback([&] { cmdBuild(configPath); });
+    buildCmd->add_option("--fix-headings", cfg.fixHeadings, "Auto-correct heading hierarchy (yes/no)");
+    buildCmd->add_option("--fix-headings-number", cfg.autoNumber, "Auto-number headings (yes/no)");
+    buildCmd->callback([&] { cmdBuild(configPath, cfg.fixHeadings, cfg.autoNumber); });
 
     auto* newCmd = app.add_subcommand("new", "Create a new post");
     std::string title;

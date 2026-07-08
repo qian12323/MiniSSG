@@ -16,6 +16,8 @@ SiteConfig loadConfig(const std::string& path)
     if (root["sourceDir"])   cfg.sourceDir   = root["sourceDir"].as<std::string>();
     if (root["outputDir"])   cfg.outputDir   = root["outputDir"].as<std::string>();
     if (root["themeDir"])    cfg.themeDir    = root["themeDir"].as<std::string>();
+    if (root["fixHeadings"]) cfg.fixHeadings = root["fixHeadings"].as<bool>();
+    if (root["autoNumber"])  cfg.autoNumber  = root["autoNumber"].as<bool>();
 
     return cfg;
 }

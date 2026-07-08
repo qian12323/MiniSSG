@@ -6,10 +6,10 @@ namespace minissg
 namespace cli
 {
 
-void cmdBuild(const std::string& configPath)
+void cmdBuild(const std::string& configPath, bool fixHeadings, bool autoNumber)
 {
     auto cfg = loadConfig(configPath);
-    build(cfg);
+    build(cfg, fixHeadings, autoNumber);
 }
 
 } // namespace cli

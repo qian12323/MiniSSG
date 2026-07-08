@@ -13,6 +13,9 @@ struct SiteConfig
     std::string sourceDir;
     std::string outputDir;
     std::string themeDir;
+
+    bool fixHeadings = true;
+    bool autoNumber = true;
 };
 
 } // namespace minissg
