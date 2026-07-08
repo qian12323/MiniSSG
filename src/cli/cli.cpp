@@ -12,22 +12,26 @@ int run(int argc, char* argv[])
     CLI::App app{"MiniSSG - A minimal static site generator"};
 
     std::string configPath = "config.yaml";
+    app.add_option("-c,--config", configPath, "Config file path")->capture_default_str();
+    app.fallthrough();
 
     auto* buildCmd = app.add_subcommand("build", "Build the site");
-    buildCmd->add_option("-c,--config", configPath, "Config file path")->capture_default_str();
     buildCmd->callback([&] { cmdBuild(configPath); });
 
     auto* newCmd = app.add_subcommand("new", "Create a new post");
     std::string title;
     newCmd->add_option("title", title, "Post title")->required();
-    newCmd->add_option("-c,--config", configPath, "Config file path")->capture_default_str();
     newCmd->callback([&] { cmdNew(title, configPath); });
 
     auto* serveCmd = app.add_subcommand("serve", "Start dev server");
     int port = 8080;
     serveCmd->add_option("-p,--port", port, "Port number")->capture_default_str();
-    serveCmd->add_option("-c,--config", configPath, "Config file path")->capture_default_str();
     serveCmd->callback([&] { cmdServe(port, configPath); });
+
+    auto* cleanCmd = app.add_subcommand("clean", "Remove stale output files");
+    bool dryRun = false;
+    cleanCmd->add_flag("-n,--dry-run", dryRun, "Show what would be removed");
+    cleanCmd->callback([&] { cmdClean(dryRun, configPath); });
 
     app.require_subcommand(1);
 
