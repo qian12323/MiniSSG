@@ -1,4 +1,4 @@
-#include "cli/command.h"
+#include "cli/cli.h"
 
 #include <ctime>
 #include <cstring>
@@ -16,7 +16,10 @@ namespace minissg
 namespace cli
 {
 
-static std::string currentDate()
+namespace
+{
+
+std::string currentDate()
 {
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
@@ -25,7 +28,7 @@ static std::string currentDate()
     return buf;
 }
 
-static std::string slugify(const std::string& title)
+std::string slugify(const std::string& title)
 {
     std::string s;
     for (char c : title)
@@ -47,28 +50,13 @@ static std::string slugify(const std::string& title)
     }
     while (!result.empty() && result.back() == '-')
         result.pop_back();
-
     return result;
 }
 
-static void run(int argc, char* argv[])
+} // anonymous namespace
+
+void cmdNew(const std::string& title, const std::string& configPath)
 {
-    if (argc < 2)
-    {
-        std::cerr << "Error: 'new' requires a title.\n";
-        std::cerr << "  minissg new \"My Post Title\"\n";
-        return;
-    }
-
-    std::string title = argv[1];
-
-    const char* configPath = "config.yaml";
-    for (int i = 2; i < argc; ++i)
-    {
-        if ((std::strcmp(argv[i], "-c") == 0 || std::strcmp(argv[i], "--config") == 0) && i + 1 < argc)
-            configPath = argv[++i];
-    }
-
     auto cfg = loadConfig(configPath);
     std::string sourceDir = cfg.sourceDir.empty() ? "posts" : cfg.sourceDir;
 
@@ -92,8 +80,6 @@ static void run(int argc, char* argv[])
 
     std::cout << "Created: " << path << "\n";
 }
-
-extern const Command cmdNew = {"new", "Create a new post", "new \"Title\" [-c config]", run};
 
 } // namespace cli
 } // namespace minissg

@@ -1,67 +1,38 @@
 #include "cli/cli.h"
-#include "cli/command.h"
 
-#include <iostream>
-#include <cstring>
+#include <CLI/CLI.hpp>
 
 namespace minissg
 {
 namespace cli
 {
 
-extern const Command cmdBuild;
-extern const Command cmdNew;
-extern const Command cmdServe;
-
-static const Command* kCommands[] = { &cmdBuild, &cmdNew, &cmdServe };
-static const int kCommandCount = sizeof(kCommands) / sizeof(kCommands[0]);
-
-void printUsage()
-{
-    std::cout << "MiniSSG - A minimal static site generator\n\nUsage:\n";
-
-    for (int i = 0; i < kCommandCount; ++i)
-    {
-        auto& c = *kCommands[i];
-        std::string line = "  minissg " + std::string(c.usage);
-        if (line.size() < 38) line += std::string(38 - line.size(), ' ');
-        std::cout << line << c.desc << "\n";
-    }
-
-    std::cout << "  minissg help" << std::string(24, ' ') << "Show this help\n\n"
-              << "Options:\n"
-              << "  -c  Path to config file (default: config.yaml)\n"
-              << "  -p  Port for dev server (default: 8080)\n";
-}
-
 int run(int argc, char* argv[])
 {
-    if (argc < 2)
-    {
-        printUsage();
-        return 1;
-    }
+    CLI::App app{"MiniSSG - A minimal static site generator"};
 
-    std::string name = argv[1];
+    std::string configPath = "config.yaml";
 
-    if (name == "help" || name == "--help" || name == "-h")
-    {
-        printUsage();
-        return 0;
-    }
+    auto* buildCmd = app.add_subcommand("build", "Build the site");
+    buildCmd->add_option("-c,--config", configPath, "Config file path")->capture_default_str();
+    buildCmd->callback([&] { cmdBuild(configPath); });
 
-    for (int i = 0; i < kCommandCount; ++i)
-    {
-        if (name == kCommands[i]->name)
-        {
-            kCommands[i]->run(argc - 1, argv + 1);
-            return 0;
-        }
-    }
+    auto* newCmd = app.add_subcommand("new", "Create a new post");
+    std::string title;
+    newCmd->add_option("title", title, "Post title")->required();
+    newCmd->add_option("-c,--config", configPath, "Config file path")->capture_default_str();
+    newCmd->callback([&] { cmdNew(title, configPath); });
 
-    std::cerr << "Unknown command: " << name << "\n";
-    printUsage();
-    return 1;
+    auto* serveCmd = app.add_subcommand("serve", "Start dev server");
+    int port = 8080;
+    serveCmd->add_option("-p,--port", port, "Port number")->capture_default_str();
+    serveCmd->add_option("-c,--config", configPath, "Config file path")->capture_default_str();
+    serveCmd->callback([&] { cmdServe(port, configPath); });
+
+    app.require_subcommand(1);
+
+    CLI11_PARSE(app, argc, argv);
+    return 0;
 }
 
 } // namespace cli

@@ -42,3 +42,12 @@ FetchContent_Declare(
     GIT_TAG 0.31.0
 )
 FetchContent_MakeAvailable(cmark)
+
+# CLI11
+FetchContent_Declare(
+  cli11
+  GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+  GIT_TAG v2.4.2
+  GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(cli11)

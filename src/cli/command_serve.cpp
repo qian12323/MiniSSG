@@ -1,10 +1,10 @@
-#include "cli/command.h"
+#include "cli/cli.h"
+#include "builder/builder.h"
 
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <filesystem>
 #include <unordered_map>
 
 #include <sys/socket.h>
@@ -12,18 +12,19 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "builder/builder.h"
-
 namespace minissg
 {
 namespace cli
 {
 
-static volatile sig_atomic_t gRunning = 1;
+namespace
+{
 
-static void handleSigint(int) { gRunning = 0; }
+volatile sig_atomic_t gRunning = 1;
 
-static std::string getMime(const std::string& path)
+void handleSigint(int) { gRunning = 0; }
+
+std::string getMime(const std::string& path)
 {
     static std::unordered_map<std::string, std::string> mime = {
         {".html", "text/html; charset=utf-8"},
@@ -46,12 +47,12 @@ static std::string getMime(const std::string& path)
     return it != mime.end() ? it->second : "application/octet-stream";
 }
 
-static bool isSafePath(const std::string& p)
+bool isSafePath(const std::string& p)
 {
     return p.find("..") == std::string::npos;
 }
 
-static std::string readFile(const std::string& path)
+std::string readFile(const std::string& path)
 {
     std::ifstream in(path, std::ios::binary);
     if (!in) return {};
@@ -60,7 +61,7 @@ static std::string readFile(const std::string& path)
     return buf.str();
 }
 
-static std::string okHeader(const std::string& mime, size_t size)
+std::string okHeader(const std::string& mime, size_t size)
 {
     return "HTTP/1.1 200 OK\r\n"
            "Content-Type: " + mime + "\r\n"
@@ -68,7 +69,7 @@ static std::string okHeader(const std::string& mime, size_t size)
            "Connection: close\r\n\r\n";
 }
 
-static std::string notFound()
+std::string notFound()
 {
     std::string body = "404 Not Found";
     return "HTTP/1.1 404 Not Found\r\n"
@@ -77,7 +78,7 @@ static std::string notFound()
            "Connection: close\r\n\r\n" + body;
 }
 
-static std::string badRequest()
+std::string badRequest()
 {
     std::string body = "400 Bad Request";
     return "HTTP/1.1 400 Bad Request\r\n"
@@ -86,7 +87,7 @@ static std::string badRequest()
            "Connection: close\r\n\r\n" + body;
 }
 
-static void handleClient(int clientFd, const std::string& rootDir)
+void handleClient(int clientFd, const std::string& rootDir)
 {
     char buf[4096];
     ssize_t n = read(clientFd, buf, sizeof(buf) - 1);
@@ -142,19 +143,10 @@ static void handleClient(int clientFd, const std::string& rootDir)
     close(clientFd);
 }
 
-static void run(int argc, char* argv[])
+} // anonymous namespace
+
+void cmdServe(int port, const std::string& configPath)
 {
-    int port = 8080;
-    const char* configPath = "config.yaml";
-
-    for (int i = 1; i < argc; ++i)
-    {
-        if ((std::strcmp(argv[i], "-p") == 0 || std::strcmp(argv[i], "--port") == 0) && i + 1 < argc)
-            port = std::stoi(argv[++i]);
-        else if ((std::strcmp(argv[i], "-c") == 0 || std::strcmp(argv[i], "--config") == 0) && i + 1 < argc)
-            configPath = argv[++i];
-    }
-
     auto cfg = loadConfig(configPath);
     std::string rootDir = cfg.outputDir.empty() ? "output" : cfg.outputDir;
 
@@ -215,8 +207,6 @@ static void run(int argc, char* argv[])
     close(sock);
     std::cout << "\nServer stopped.\n";
 }
-
-extern const Command cmdServe = {"serve", "Start dev server", "serve [-p port] [-c config]", run};
 
 } // namespace cli
 } // namespace minissg
