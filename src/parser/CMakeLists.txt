@@ -6,4 +6,4 @@ add_library(parser STATIC ${CURRENT_SOURCES})
 
 # 链接一下第三方库
 target_include_directories(parser PUBLIC $<BUILD_INTERFACE:${cmark_SOURCE_DIR}/src>)
-target_link_libraries(parser PUBLIC cmark)
+target_link_libraries(parser PUBLIC cmark yaml-cpp)
