@@ -3,14 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{title}}</title>
+<title>Tags - {{title}}</title>
 <style>
   body { max-width:720px; margin:40px auto; padding:0 20px; font:16px/1.7 system-ui,sans-serif; color:#333; }
   nav { margin-bottom:28px; padding-bottom:12px; border-bottom:1px solid #eee; }
   nav a { color:#0366d6; text-decoration:none; margin-right:20px; }
   nav a:hover { text-decoration:underline; }
-  .post-item { margin:10px 0; }
-  .post-date { color:#888; font-size:14px; margin-right:12px; }
+  .tag-group { margin:20px 0; }
+  .tag-group h2 { font-size:18px; color:#555; }
+  .tag-count { color:#888; font-size:14px; font-weight:normal; }
+  .view-all { list-style:none; }
+  ul { padding-left:20px; list-style:none; }
+  li { margin:4px 0; }
+  .post-date { color:#888; font-size:14px; margin-left:8px; }
 </style>
 </head>
 <body>
@@ -19,8 +24,7 @@
   <a href="/tags.html">Tags</a>
   <a href="/categories.html">Categories</a>
 </nav>
-<h1>{{title}}</h1>
-<p>{{description}}</p>
-{{posts}}
+<h1>Tags</h1>
+{{groups}}
 </body>
 </html>
