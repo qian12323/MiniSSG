@@ -26,8 +26,19 @@ void build(const SiteConfig& config)
 
     for (auto& entry : fs::recursive_directory_iterator(config.sourceDir))
     {
-        if (!entry.is_regular_file() || entry.path().extension() != ".md")
+        if (!entry.is_regular_file())
             continue;
+
+        if (entry.path().extension() != ".md")
+        {
+            // 非 md 文件原样复制（图片等静态资源）
+            std::string rel = fs::relative(entry.path(), srcRoot).string();
+            std::string outPath = config.outputDir + "/" + rel;
+            fs::create_directories(fs::path(outPath).parent_path());
+            fs::copy_file(entry.path(), outPath,
+                          fs::copy_options::overwrite_existing);
+            continue;
+        }
 
         std::string path = entry.path().string();
         std::cout << "Parsing: " << path << std::endl;

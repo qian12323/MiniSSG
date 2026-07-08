@@ -55,15 +55,36 @@ std::string slugify(const std::string& title)
 
 } // anonymous namespace
 
-void cmdNew(const std::string& title, const std::string& configPath)
+void cmdNew(const std::string& title, const std::string& category, const std::string& configPath)
 {
     auto cfg = loadConfig(configPath);
     std::string sourceDir = cfg.sourceDir.empty() ? "posts" : cfg.sourceDir;
+    std::string targetDir = sourceDir + "/" + category;
 
-    fs::create_directories(sourceDir);
+    // 检查分类目录是否存在，不存在则不自动创建
+    if (!fs::exists(targetDir))
+    {
+        std::cerr << "Error: category '" << category
+                  << "' does not exist in " << sourceDir << "/\n";
+        std::cerr << "       Create it first: mkdir " << targetDir << "\n";
+        if (fs::exists(sourceDir))
+        {
+            std::cerr << "       Available: ";
+            bool first = true;
+            for (auto& d : fs::directory_iterator(sourceDir))
+            {
+                if (!d.is_directory()) continue;
+                if (!first) std::cerr << ", ";
+                std::cerr << d.path().filename().string();
+                first = false;
+            }
+            std::cerr << "\n";
+        }
+        return;
+    }
 
     std::string filename = currentDate() + "-" + slugify(title) + ".md";
-    std::string path = sourceDir + "/" + filename;
+    std::string path = targetDir + "/" + filename;
 
     if (fs::exists(path))
     {

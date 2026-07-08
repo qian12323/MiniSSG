@@ -20,8 +20,10 @@ int run(int argc, char* argv[])
 
     auto* newCmd = app.add_subcommand("new", "Create a new post");
     std::string title;
+    std::string category = "other";
     newCmd->add_option("title", title, "Post title")->required();
-    newCmd->callback([&] { cmdNew(title, configPath); });
+    newCmd->add_option("--categ", category, "Category (subdirectory name)")->capture_default_str();
+    newCmd->callback([&] { cmdNew(title, category, configPath); });
 
     auto* serveCmd = app.add_subcommand("serve", "Start dev server");
     int port = 8080;

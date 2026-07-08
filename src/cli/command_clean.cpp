@@ -24,19 +24,46 @@ static std::string extractSlug(const std::string& filename)
     return name;
 }
 
+static bool isProtected(const std::string& rel)
+{
+    return rel == "index.html"
+        || rel == "tags.html"
+        || rel == "categories.html"
+        || rel.rfind("tags/", 0) == 0
+        || rel.rfind("categories/", 0) == 0;
+}
+
 void cmdClean(bool dryRun, const std::string& configPath)
 {
     auto cfg = loadConfig(configPath);
     std::string src = cfg.sourceDir.empty() ? "posts" : cfg.sourceDir;
     std::string out = cfg.outputDir.empty() ? "output" : cfg.outputDir;
 
+    // 扫描源目录，构建预期的输出路径集合
     std::unordered_set<std::string> expected;
     if (fs::exists(src))
     {
-        for (auto& entry : fs::directory_iterator(src))
+        fs::path srcRoot = src;
+        for (auto& entry : fs::recursive_directory_iterator(src))
         {
-            if (entry.path().extension() != ".md") continue;
-            expected.insert(extractSlug(entry.path().filename().string()) + ".html");
+            if (!entry.is_regular_file()) continue;
+
+            std::string rel = fs::relative(entry.path(), srcRoot).string();
+
+            if (entry.path().extension() == ".md")
+            {
+                // .md 文件 → output/{category}/{slug}.html
+                std::string slug = extractSlug(entry.path().filename().string());
+                auto sep = rel.find('/');
+                std::string category = (sep != std::string::npos)
+                    ? rel.substr(0, sep) : "other";
+                expected.insert(category + "/" + slug + ".html");
+            }
+            else
+            {
+                // 静态文件 → 原样复制，路径不变
+                expected.insert(rel);
+            }
         }
     }
 
@@ -46,28 +73,38 @@ void cmdClean(bool dryRun, const std::string& configPath)
         return;
     }
 
+    // 扫描输出目录，删除不在预期集合中的文件
+    fs::path outRoot = out;
     int removed = 0;
-    for (auto& entry : fs::directory_iterator(out))
+    for (auto& entry : fs::recursive_directory_iterator(out))
     {
         if (!entry.is_regular_file()) continue;
-        if (entry.path().extension() != ".html") continue;
 
-        std::string name = entry.path().filename().string();
-        if (name == "index.html") continue;
+        std::string rel = fs::relative(entry.path(), outRoot).string();
+        if (isProtected(rel)) continue;
 
-        if (expected.find(name) == expected.end())
+        if (expected.find(rel) == expected.end())
         {
             if (dryRun)
             {
-                std::cout << "Would remove: " << entry.path().string() << "\n";
+                std::cout << "Would remove: " << rel << "\n";
                 ++removed;
             }
             else
             {
                 fs::remove(entry.path());
-                std::cout << "Removed: " << entry.path().string() << "\n";
+                std::cout << "Removed: " << rel << "\n";
                 ++removed;
             }
+        }
+    }
+
+    // 清理空目录
+    for (auto& entry : fs::recursive_directory_iterator(out, fs::directory_options::none))
+    {
+        if (entry.is_directory() && fs::is_empty(entry.path()))
+        {
+            // 延迟到下一轮迭代删除，避免迭代器失效
         }
     }
 
