@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #include <yaml-cpp/yaml.h>
-#include <cmark.h>
+#include <md4c-html.h>
 
 namespace minissg
 {
@@ -75,20 +75,20 @@ Article parseFrontmatter(const std::string& yaml)
     return art;
 }
 
+static void mdCallback(const MD_CHAR* text, MD_SIZE size, void* userdata)
+{
+    static_cast<std::string*>(userdata)->append(text, size);
+}
+
 std::string renderMarkdown(const std::string& md)
 {
     if (md.empty()) return {};
 
-    auto doc = cmark_parse_document(md.c_str(), md.size(), CMARK_OPT_DEFAULT);
-    if (!doc) return {};
+    std::string html;
+    unsigned flags = MD_FLAG_TABLES | MD_FLAG_STRIKETHROUGH | MD_FLAG_TASKLISTS;
+    md_html(md.c_str(), static_cast<MD_SIZE>(md.size()), mdCallback, &html, flags, 0);
 
-    char* html = cmark_render_html(doc, CMARK_OPT_UNSAFE);
-    std::string result(html ? html : "");
-
-    if (html) free(html);
-    cmark_node_free(doc);
-
-    return result;
+    return html;
 }
 
 } // anonymous namespace
