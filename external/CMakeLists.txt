@@ -1,5 +1,6 @@
 include(FetchContent)
 
+# 
 FetchContent_Declare(
   md4c
   GIT_REPOSITORY https://github.com/mity/md4c.git
@@ -10,6 +11,7 @@ set(MD4C_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(MD4C_BUILD_TESTING  OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(md4c)
 
+# yaml-cpp
 FetchContent_Declare(
   yaml-cpp
   GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
@@ -22,6 +24,7 @@ set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "" FORCE)
 set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(yaml-cpp)
 
+# gtest
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
@@ -31,3 +34,11 @@ FetchContent_Declare(
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+# cmark
+FetchContent_Declare(
+    cmark
+    GIT_REPOSITORY https://github.com/commonmark/cmark.git
+    GIT_TAG 0.31.0
+)
+FetchContent_MakeAvailable(cmark)

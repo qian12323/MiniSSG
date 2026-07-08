@@ -1,6 +1,7 @@
 #include<iostream>
+#include "parser/demo.cpp"
 
 int main(){
-    std::cout<<"Hello, World!"<<std::endl;
+    minissg::test();
     return 0;
 }

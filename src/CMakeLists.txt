@@ -11,7 +11,7 @@ add_library(ssg_all INTERFACE)
 target_link_libraries(ssg_all
   INTERFACE 
   # core
-  # parser 
+  parser 
   # renderer 
   # builder 
   cli
