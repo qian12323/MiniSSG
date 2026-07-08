@@ -1,5 +1,5 @@
 #include "builder/builder.h"
-#include "build_utils.h"
+#include "builder/build_utils.h"
 
 #include <fstream>
 #include <iostream>
@@ -18,6 +18,7 @@ void buildTags(const std::vector<Article>& articles, const SiteConfig& config)
     std::string tagsTpl = loadTemplate(config.themeDir + "/tags.html");
     std::string tagTpl  = loadTemplate(config.themeDir + "/tag.html");
 
+    // 按标签分组
     std::map<std::string, std::vector<Article>> tagMap;
     for (auto& a : articles)
         for (auto& t : a.tags)
@@ -27,10 +28,13 @@ void buildTags(const std::vector<Article>& articles, const SiteConfig& config)
         std::sort(vec.begin(), vec.end(),
             [](const Article& a, const Article& b) { return a.date > b.date; });
 
+    // 摘要页 + 详情页
     std::string summary;
     for (auto& [tag, vec] : tagMap)
     {
         int total = static_cast<int>(vec.size());
+
+        // 摘要：每个标签只展示最新 2 篇
         summary += "<div class=\"tag-group\">\n"
                    "<h2>" + tag + " <span class=\"tag-count\">("
                    + std::to_string(total) + ")</span></h2>\n<ul>\n";
@@ -39,10 +43,13 @@ void buildTags(const std::vector<Article>& articles, const SiteConfig& config)
         for (int i = 0; i < shown; ++i)
             summary += "  <li>" + articleLink(vec[i])
                      + "<span class=\"post-date\">" + vec[i].date + "</span></li>\n";
+
         if (total > 2)
-            summary += "  <li class=\"view-all\"><a href=\"/tags/" + tag + ".html\">View all →</a></li>\n";
+            summary += "  <li class=\"view-all\">"
+                       "<a href=\"/tags/" + tag + ".html\">View all →</a></li>\n";
         summary += "</ul>\n</div>\n";
 
+        // 详情页：该标签下全部文章
         std::string detail = tagTpl;
         std::string postsHtml;
         for (auto& a : vec)

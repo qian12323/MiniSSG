@@ -1,5 +1,5 @@
 #include "builder/builder.h"
-#include "build_utils.h"
+#include "builder/build_utils.h"
 
 #include <fstream>
 #include <iostream>
@@ -12,6 +12,7 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
 {
     std::string tpl = loadTemplate(config.themeDir + "/index.html");
 
+    // 时间线列表：日期 + 标题链接
     std::string list;
     for (auto& a : articles)
     {

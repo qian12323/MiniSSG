@@ -1,5 +1,5 @@
 #include "builder/builder.h"
-#include "build_utils.h"
+#include "builder/build_utils.h"
 
 #include <fstream>
 #include <filesystem>
@@ -20,6 +20,7 @@ void build(const SiteConfig& config)
 
     std::string postTpl = loadTemplate(config.themeDir + "/post.html");
 
+    // 1. 扫描、解析、写出文章页
     std::vector<Article> articles;
     fs::path srcRoot = config.sourceDir;
 
@@ -33,6 +34,7 @@ void build(const SiteConfig& config)
 
         auto art = parseArticle(path);
 
+        // 从相对路径提取分类目录名
         std::string rel = fs::relative(entry.path(), srcRoot).string();
         auto sep = rel.find('/');
         if (sep != std::string::npos)
@@ -40,9 +42,9 @@ void build(const SiteConfig& config)
         else
             art.category = "other";
 
-        std::string outRel = art.category + "/" + art.slug + ".html";
-        std::string outPath = config.outputDir + "/" + outRel;
-
+        // 输出路径保持分类目录结构：output/{category}/{slug}.html
+        std::string outPath = config.outputDir + "/"
+                            + art.category + "/" + art.slug + ".html";
         fs::create_directories(fs::path(outPath).parent_path());
 
         auto html = renderPost(art, postTpl);
@@ -55,9 +57,11 @@ void build(const SiteConfig& config)
         articles.push_back(art);
     }
 
+    // 按日期倒序，供聚合页使用
     std::sort(articles.begin(), articles.end(),
         [](const Article& a, const Article& b) { return a.date > b.date; });
 
+    // 2. 生成聚合页
     buildIndex(articles, config);
     buildTags(articles, config);
     buildCategories(articles, config);
