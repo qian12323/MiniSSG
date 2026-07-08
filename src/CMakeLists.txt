@@ -10,7 +10,7 @@ add_subdirectory(cli)
 add_library(ssg_all INTERFACE)
 target_link_libraries(ssg_all
   INTERFACE 
-  # core
+  core
   parser 
   # renderer 
   # builder 
