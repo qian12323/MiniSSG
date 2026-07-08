@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{category}} - Categories - {{siteTitle}}</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-alt: #f6f8fa;
+    --text: #24292f;
+    --text-muted: #656d76;
+    --border: #d0d7de;
+    --link: #0969da;
+    --accent: #0969da;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  html[data-theme="dark"] {
+    --bg: #0d1117;
+    --bg-alt: #161b22;
+    --text: #c9d1d9;
+    --text-muted: #8b949e;
+    --border: #30363d;
+    --link: #58a6ff;
+    --accent: #58a6ff;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font:16px/1.75 system-ui,-apple-system,sans-serif; background:var(--bg-alt); color:var(--text); min-height:100vh; }
+
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:14px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+  .site-name { font-weight:700; font-size:18px; color:var(--text); text-decoration:none; }
+  nav { display:flex; align-items:center; gap:18px; }
+  nav a { color:var(--text-muted); text-decoration:none; font-size:15px; }
+  nav a:hover { color:var(--link); }
+  .btn-theme { background:none; border:1px solid var(--border); color:var(--text); font-size:16px; padding:4px 8px; border-radius:6px; cursor:pointer; }
+  .btn-theme:hover { background:var(--bg-alt); }
+
+  main { max-width:800px; margin:32px auto; padding:0 24px; }
+  .page-head { background:var(--bg); padding:36px 40px; border-radius:10px; box-shadow:var(--shadow); margin-bottom:24px; }
+  .page-head h1 { font-size:1.5em; }
+
+  .posts { background:var(--bg); border-radius:10px; box-shadow:var(--shadow); overflow:hidden; }
+  .posts li { padding:14px 40px; border-bottom:1px solid var(--border); list-style:none; }
+  .posts li:last-child { border-bottom:none; }
+  .posts a { color:var(--link); text-decoration:none; }
+  .posts a:hover { text-decoration:underline; }
+  .post-date { color:var(--text-muted); font-size:13px; margin-left:10px; }
+
+  .back { margin-top:24px; }
+  .back a { color:var(--link); font-size:14px; text-decoration:none; }
+  .back a:hover { text-decoration:underline; }
+
+  footer { text-align:center; padding:32px 24px; color:var(--text-muted); font-size:13px; border-top:1px solid var(--border); margin-top:40px; }
+  footer a { color:var(--link); }
+</style>
+<script>
+(function(){
+  var el=document.documentElement;
+  var s=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  el.setAttribute('data-theme',s);
+  updateBtn(s);
+  window.toggleTheme=function(){
+    var n=el.getAttribute('data-theme')==='dark'?'light':'dark';
+    el.setAttribute('data-theme',n);
+    localStorage.setItem('theme',n);
+    updateBtn(n);
+  };
+  function updateBtn(s){var b=document.querySelector('.btn-theme');if(b)b.textContent=s==='dark'?'☀️':'🌙';}
+})();
+</script>
+</head>
+<body>
+<header>
+  <a class="site-name" href="/">{{siteTitle}}</a>
+  <nav>
+    <button class="btn-theme" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    <a href="/">Home</a>
+    <a href="/tags.html">Tags</a>
+    <a href="/categories.html">Categories</a>
+  </nav>
+</header>
+
+<main>
+<div class="page-head">
+  <h1>Categories / {{category}}</h1>
+</div>
+
+<ul class="posts">
+{{posts}}
+</ul>
+
+<div class="back">
+  <a href="/categories.html">← Back to Categories</a>
+</div>
+</main>
+
+<footer>
+  <p>© 2026 {{siteTitle}} · Built with <a href="https://github.com">MiniSSG</a></p>
+</footer>
+</body>
+</html>
