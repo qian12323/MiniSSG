@@ -12,7 +12,7 @@ target_link_libraries(ssg_all
   INTERFACE 
   core
   parser 
-  # renderer 
+  renderer 
   # builder 
   cli
 )
