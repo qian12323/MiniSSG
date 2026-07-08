@@ -1,18 +1,8 @@
-#include <iostream>
-#include <fstream>
-#include "parser/parser.h"
-#include "renderer/renderer.h"
+#include "builder/builder.h"
 
 int main()
 {
-    auto art = minissg::parseArticle("posts/test.md");
-
-    auto tpl = minissg::loadTemplate("themes/default/post.html");
-    auto page = minissg::renderPost(art, tpl);
-
-    std::ofstream out("output/test.html");
-    out << page;
-
-    std::cout << "Generated: output/test.html" << std::endl;
+    auto config = minissg::loadConfig("config.yaml");
+    minissg::build(config);
     return 0;
 }
