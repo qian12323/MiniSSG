@@ -1,11 +1,10 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <ctime>
+#include "cli/command.h"
+
 #include <cstring>
-#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <filesystem>
-#include <vector>
 #include <unordered_map>
 
 #include <sys/socket.h>
@@ -13,77 +12,12 @@
 #include <unistd.h>
 #include <signal.h>
 
-namespace fs = std::filesystem;
+#include "builder/builder.h"
 
 namespace minissg
 {
 namespace cli
 {
-
-// ---- helpers ----
-
-static std::string currentDate()
-{
-    auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
-    char buf[16];
-    std::strftime(buf, sizeof(buf), "%Y-%m-%d", &tm);
-    return buf;
-}
-
-static std::string slugify(const std::string& title)
-{
-    std::string s;
-    for (char c : title)
-    {
-        if (std::isalnum(static_cast<unsigned char>(c)) || c == ' ')
-            s += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-        else if (c == '-' || c == '_')
-            s += c;
-    }
-    for (auto& c : s)
-        if (c == ' ') c = '-';
-
-    std::string result;
-    for (size_t i = 0; i < s.size(); ++i)
-    {
-        if (s[i] == '-' && (i == 0 || s[i - 1] == '-'))
-            continue;
-        result += s[i];
-    }
-    while (!result.empty() && result.back() == '-')
-        result.pop_back();
-
-    return result;
-}
-
-// ---- command: new ----
-
-void commandNew(const std::string& title, const std::string& sourceDir)
-{
-    fs::create_directories(sourceDir);
-
-    std::string filename = currentDate() + "-" + slugify(title) + ".md";
-    std::string path = sourceDir + "/" + filename;
-
-    if (fs::exists(path))
-    {
-        std::cerr << "File already exists: " << path << "\n";
-        return;
-    }
-
-    std::ofstream out(path);
-    out << "---\n"
-        << "title: \"" << title << "\"\n"
-        << "date: " << currentDate() << "\n"
-        << "tags: []\n"
-        << "---\n\n";
-    out.close();
-
-    std::cout << "Created: " << path << "\n";
-}
-
-// ---- command: serve ----
 
 static volatile sig_atomic_t gRunning = 1;
 
@@ -103,7 +37,7 @@ static std::string getMime(const std::string& path)
         {".jpeg", "image/jpeg"},
         {".gif",  "image/gif"},
         {".ico",  "image/x-icon"},
-        {".woff","font/woff"},
+        {".woff", "font/woff"},
         {".woff2","font/woff2"},
     };
     auto dot = path.rfind('.');
@@ -208,8 +142,22 @@ static void handleClient(int clientFd, const std::string& rootDir)
     close(clientFd);
 }
 
-void commandServe(const std::string& rootDir, int port)
+static void run(int argc, char* argv[])
 {
+    int port = 8080;
+    const char* configPath = "config.yaml";
+
+    for (int i = 1; i < argc; ++i)
+    {
+        if ((std::strcmp(argv[i], "-p") == 0 || std::strcmp(argv[i], "--port") == 0) && i + 1 < argc)
+            port = std::stoi(argv[++i]);
+        else if ((std::strcmp(argv[i], "-c") == 0 || std::strcmp(argv[i], "--config") == 0) && i + 1 < argc)
+            configPath = argv[++i];
+    }
+
+    auto cfg = loadConfig(configPath);
+    std::string rootDir = cfg.outputDir.empty() ? "output" : cfg.outputDir;
+
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0)
     {
@@ -267,6 +215,8 @@ void commandServe(const std::string& rootDir, int port)
     close(sock);
     std::cout << "\nServer stopped.\n";
 }
+
+extern const Command cmdServe = {"serve", "Start dev server", "serve [-p port] [-c config]", run};
 
 } // namespace cli
 } // namespace minissg
