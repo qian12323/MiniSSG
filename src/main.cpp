@@ -1,8 +1,6 @@
-#include "builder/builder.h"
+#include "cli/cli.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    auto config = minissg::loadConfig("config.yaml");
-    minissg::build(config);
-    return 0;
+    return minissg::cli::run(argc, argv);
 }
