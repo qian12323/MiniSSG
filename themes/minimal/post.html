@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="zh" data-theme="light">
+<html lang="zh">
 <head>
+<script>(function(){var t=localStorage.getItem("theme");if(!t){t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}document.documentElement.setAttribute("data-theme",t);})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{title}} - {{siteTitle}}</title>
@@ -42,7 +43,7 @@
   .btn-theme:hover { background:var(--bg-alt); }
 
   /* ---- main: 正文左 + 目录右 ---- */
-  main { max-width:1100px; margin:32px auto; padding:0 24px; display:flex; gap:32px; align-items:flex-start; }
+  main { max-width:1300px; margin:32px auto; padding:0 18px; display:flex; gap:32px; align-items:flex-start; }
   article { flex:1; min-width:0; background:var(--bg); padding:36px 40px; border-radius:10px; box-shadow:var(--shadow); }
   .article-head { margin-bottom:28px; }
   .article-head h1 { font-size:1.8em; line-height:1.3; }
@@ -97,9 +98,7 @@ MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]}};
 <script>
 (function(){
   var el=document.documentElement;
-  var s=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  el.setAttribute('data-theme',s);
-  updateBtn(s);
+  updateBtn(el.getAttribute("data-theme"));
   window.toggleTheme=function(){
     var n=el.getAttribute('data-theme')==='dark'?'light':'dark';
     el.setAttribute('data-theme',n);

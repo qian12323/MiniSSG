@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="zh" data-theme="light">
+<html lang="zh">
 <head>
+<script>(function(){var t=localStorage.getItem("theme");if(!t){t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}document.documentElement.setAttribute("data-theme",t);})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tags - {{title}}</title>
@@ -58,9 +59,7 @@
 <script>
 (function(){
   var el=document.documentElement;
-  var s=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  el.setAttribute('data-theme',s);
-  updateBtn(s);
+  updateBtn(el.getAttribute("data-theme"));
   window.toggleTheme=function(){
     var n=el.getAttribute('data-theme')==='dark'?'light':'dark';
     el.setAttribute('data-theme',n);
