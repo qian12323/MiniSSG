@@ -31,7 +31,10 @@
 </div>
 
 <aside class="index-sidebar">
-  {{sidebar}}
+  <div class="side-card search-card">
+    <h3>搜索</h3>
+    <input type="text" id="searchInput" class="search-input" placeholder="按标题搜索...">
+  </div>
 
   <div class="side-card filter-card">
     <div class="filter-head">
@@ -45,6 +48,8 @@
     <div class="filter-label">Categories</div>
     <div id="filter-cats" class="filter-cats"></div>
   </div>
+
+  {{sidebar}}
 </aside>
 </main>
 
@@ -57,6 +62,30 @@
 <script src="/assets/heatmap.js"></script>
 <script>window.__filterTagGraph={{filterTagGraph}};window.__filterCatCloud={{filterCatCloud}};</script>
 <script src="/assets/filter.js"></script>
+<script>
+document.getElementById('searchInput').addEventListener('input', function() {
+  var q = this.value.toLowerCase();
+  document.querySelectorAll('.index-card').forEach(function(c) {
+    var title = c.querySelector('h3');
+    if (!title) return;
+    if (!q || title.textContent.toLowerCase().indexOf(q)>=0) c.classList.remove('filtered');
+    else c.classList.add('filtered');
+  });
+});
+</script>
+
+<button id="backTop" class="back-top" title="回到顶部">↑</button>
+<script>
+(function(){
+  var btn = document.getElementById('backTop');
+  function toggle() { btn.style.display = window.scrollY > 300 ? '' : 'none'; }
+  window.addEventListener('scroll', toggle);
+  toggle();
+  btn.addEventListener('click', function() {
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+})();
+</script>
 <script>
 (function(){
   document.querySelectorAll('.card-tags').forEach(function(t){

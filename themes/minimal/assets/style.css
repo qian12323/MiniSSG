@@ -115,6 +115,10 @@ main { max-width:800px; margin:32px auto; padding:0 18px; }
 .side-card a:hover { color:var(--link); }
 .side-card li span { color:var(--text-muted); font-size:11px; margin-left:4px; }
 
+.search-input { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); font-size:13px; outline:none; }
+.search-input:focus { border-color:var(--link); }
+.search-input::placeholder { color:var(--text-muted); }
+
 /* ===== Filter card ===== */
 .filter-card { padding:14px 16px; }
 .filter-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
@@ -198,6 +202,9 @@ html[data-theme="dark"] .hm-l4 { background:#39d353; }
 .back-link { margin-top:24px; }
 .back-link a { color:var(--link); font-size:14px; text-decoration:none; }
 .back-link a:hover { text-decoration:underline; }
+
+.back-top { position:fixed; bottom:24px; right:24px; width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--bg); color:var(--text-muted); font-size:18px; cursor:pointer; box-shadow:var(--shadow); z-index:50; display:none; transition:opacity 0.2s; }
+.back-top:hover { color:var(--link); border-color:var(--link); }
 
 /* ===== Mobile ===== */
 @media (max-width:860px) {
