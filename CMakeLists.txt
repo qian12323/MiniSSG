@@ -10,6 +10,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# 需要 Python3 用于编译时嵌入主题文件
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 # 产物输出目录
 # 可执行文件放 build/bin
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

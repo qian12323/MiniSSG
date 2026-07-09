@@ -13,6 +13,7 @@ int run(int argc, char* argv[])
 {
     // 先提取 config 路径，加载配置作为 CLI 默认值
     std::string configPath = "config.yaml";
+    bool needConfig = true;
     for (int i = 1; i < argc; ++i)
     {
         if ((std::strcmp(argv[i], "-c") == 0 || std::strcmp(argv[i], "--config") == 0)
@@ -21,8 +22,15 @@ int run(int argc, char* argv[])
             configPath = argv[++i];
             break;
         }
+        if (std::strcmp(argv[i], "newsite") == 0 || std::strcmp(argv[i], "help") == 0
+            || std::strcmp(argv[i], "--help") == 0 || std::strcmp(argv[i], "-h") == 0)
+        {
+            needConfig = false;
+            break;
+        }
     }
-    auto cfg = loadConfig(configPath);
+    SiteConfig cfg;
+    if (needConfig) cfg = loadConfig(configPath);
 
     CLI::App app{"MiniSSG - A minimal static site generator"};
 
@@ -50,6 +58,11 @@ int run(int argc, char* argv[])
     bool dryRun = false;
     cleanCmd->add_flag("-n,--dry-run", dryRun, "Show what would be removed");
     cleanCmd->callback([&] { cmdClean(dryRun, configPath); });
+
+    auto* newsiteCmd = app.add_subcommand("newsite", "Create a new site");
+    std::string siteName;
+    newsiteCmd->add_option("name", siteName, "Site directory name")->required();
+    newsiteCmd->callback([&] { cmdNewSite(siteName); });
 
     app.require_subcommand(1);
 
