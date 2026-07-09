@@ -1,8 +1,10 @@
-#include "cli/cli.h"
-#include "builder/builder.h"
+#include <cli/cli.h>
+#include <builder/builder.h>
 
 #include <cstring>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
@@ -50,6 +52,21 @@ std::string getMime(const std::string& path)
 bool isSafePath(const std::string& p)
 {
     return p.find("..") == std::string::npos;
+}
+
+static std::string urlDecode(const std::string& s)
+{
+    std::string r;
+    for (size_t i = 0; i < s.size(); ++i)
+    {
+        if (s[i] == '%' && i + 2 < s.size() && std::isxdigit(s[i+1]) && std::isxdigit(s[i+2]))
+        {
+            int v; std::istringstream(s.substr(i+1,2)) >> std::hex >> v;
+            r += static_cast<char>(v); i += 2;
+        }
+        else r += s[i];
+    }
+    return r;
 }
 
 std::string readFile(const std::string& path)
@@ -124,7 +141,7 @@ void handleClient(int clientFd, const std::string& rootDir)
         return;
     }
 
-    std::string filePath = rootDir + rawPath;
+    std::string filePath = rootDir + urlDecode(rawPath);
     if (rawPath == "/") filePath = rootDir + "/index.html";
 
     std::string content = readFile(filePath);

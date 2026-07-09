@@ -19,9 +19,9 @@ MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]}};
   <a class="site-name" href="/">{{siteTitle}}</a>
   <nav>
     <button class="btn-theme" onclick="toggleTheme()" title="Toggle theme">🌙</button>
-    <a href="/">Home</a>
-    <a href="/tags.html">Tags</a>
-    <a href="/categories.html">Categories</a>
+    <a href="/">主页</a>
+    <a href="/tags.html">标签</a>
+    <a href="/categories.html">分类</a>
   </nav>
 </header>
 
@@ -53,6 +53,30 @@ MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]}};
 </footer>
 
 <script>window.__autoNumber = {{autoNumber}};</script>
+<script>
+(function(){
+  var content = document.querySelector('.content');
+  if (!content) return;
+  var firstH = content.querySelector('h1,h2,h3,h4,h5,h6');
+  var introNodes = [];
+  var cur = content.firstElementChild;
+  while (cur && cur !== firstH) {
+    introNodes.push(cur);
+    cur = cur.nextElementSibling;
+  }
+  if (!introNodes.length) return;
+
+  var wrap = document.createElement('div');
+  wrap.className = 'intro-wrap';
+  introNodes.forEach(function(n) { wrap.appendChild(n); });
+  content.insertBefore(wrap, content.firstChild);
+
+  var img = wrap.querySelector('img');
+  if (img) {
+    img.classList.add('intro-cover');
+  }
+})();
+</script>
 <script src="/assets/theme.js"></script>
 <script src="/assets/toc.js"></script>
 <script>hljs.highlightAll();</script>

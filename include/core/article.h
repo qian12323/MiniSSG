@@ -16,6 +16,9 @@ struct Article
 
     std::string rawContent;
     std::string htmlContent;
+
+    std::string excerpt;
+    std::string coverImage;
 };
 
 } // namespace minissg

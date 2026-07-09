@@ -12,9 +12,9 @@
   <a class="site-name" href="/">{{title}}</a>
   <nav>
     <button class="btn-theme" onclick="toggleTheme()" title="Toggle theme">🌙</button>
-    <a href="/">Home</a>
-    <a href="/tags.html">Tags</a>
-    <a href="/categories.html">Categories</a>
+    <a href="/">主页</a>
+    <a href="/tags.html">标签</a>
+    <a href="/categories.html">分类</a>
   </nav>
 </header>
 
@@ -24,9 +24,7 @@
   <p>{{description}}</p>
 </div>
 
-<div class="posts-card">
 {{posts}}
-</div>
 </main>
 
 <footer>
@@ -34,5 +32,13 @@
 </footer>
 
 <script src="/assets/theme.js"></script>
+<script>
+(function(){
+  document.querySelectorAll('.card-tags').forEach(function(t){
+    var tags=t.textContent.split(/,\s*/).filter(Boolean);
+    var h=''; tags.forEach(function(x){h+='<a href=\"/tags/'+x+'.html\" class=\"tag-pill\">'+x+'</a>'});t.innerHTML=h;
+  });
+})();
+</script>
 </body>
 </html>
