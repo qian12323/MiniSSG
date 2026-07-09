@@ -37,7 +37,7 @@ int run(int argc, char* argv[])
     app.add_option("-c,--config", configPath, "Config file path")->capture_default_str();
     app.fallthrough();
 
-    auto* buildCmd = app.add_subcommand("build", "Build the site");
+    auto* buildCmd = app.add_subcommand("build", "Build the site")->alias("b");
     buildCmd->add_option("--fix-headings", cfg.fixHeadings, "Auto-correct heading hierarchy (yes/no)");
     buildCmd->add_option("--fix-headings-number", cfg.autoNumber, "Auto-number headings (yes/no)");
     buildCmd->callback([&] { cmdBuild(configPath, cfg.fixHeadings, cfg.autoNumber); });
@@ -49,19 +49,19 @@ int run(int argc, char* argv[])
     newCmd->add_option("--categ", category, "Category (subdirectory name)")->capture_default_str();
     newCmd->callback([&] { cmdNew(title, category, configPath); });
 
-    auto* serveCmd = app.add_subcommand("serve", "Start dev server");
+    auto* serveCmd = app.add_subcommand("run", "Start dev server")->alias("r");
     int port = 8080;
     serveCmd->add_option("-p,--port", port, "Port number")->capture_default_str();
     serveCmd->callback([&] { cmdServe(port, configPath); });
 
-    auto* cleanCmd = app.add_subcommand("clean", "Remove stale output files");
+    auto* cleanCmd = app.add_subcommand("clean", "Remove stale output files")->alias("c");
     bool dryRun = false;
     cleanCmd->add_flag("-n,--dry-run", dryRun, "Show what would be removed");
     cleanCmd->callback([&] { cmdClean(dryRun, configPath); });
 
-    auto* newsiteCmd = app.add_subcommand("newsite", "Create a new site");
+    auto* newsiteCmd = app.add_subcommand("newsite", "Create a new site")->alias("ns");
     std::string siteName;
-    newsiteCmd->add_option("name", siteName, "Site directory name")->required();
+    newsiteCmd->add_option("-n,--name", siteName, "Site directory name")->required();
     newsiteCmd->callback([&] { cmdNewSite(siteName); });
 
     app.require_subcommand(1);
