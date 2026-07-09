@@ -3,6 +3,9 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
+
 #include "renderer/renderer.h"
 
 namespace minissg
@@ -12,6 +15,7 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
 {
     std::string tpl = loadTemplate(config.themeDir + "/index.html");
 
+    // 文章卡片列表
     std::string list;
     for (auto& a : articles)
     {
@@ -56,9 +60,29 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
         list += "</div>\n";
     }
 
+    // 侧边栏：分类 + 标签
+    std::map<std::string, int> cats, tagMap;
+    for (auto& a : articles)
+    {
+        cats[a.category]++;
+        for (auto& t : a.tags) tagMap[t]++;
+    }
+
+    std::string sidebar;
+    sidebar += "<div class=\"side-card\"><h3>分类</h3><ul>";
+    for (auto& [c, n] : cats)
+        sidebar += "<li><a href=\"/categories/" + c + ".html\">" + c + "</a> <span>(" + std::to_string(n) + ")</span></li>";
+    sidebar += "</ul></div>";
+
+    sidebar += "<div class=\"side-card\"><h3>标签</h3><ul>";
+    for (auto& [t, n] : tagMap)
+        sidebar += "<li><a href=\"/tags/" + t + ".html\">" + t + "</a> <span>(" + std::to_string(n) + ")</span></li>";
+    sidebar += "</ul></div>";
+
     replace(tpl, "{{title}}",       config.title);
     replace(tpl, "{{description}}", config.description);
     replace(tpl, "{{posts}}",       list);
+    replace(tpl, "{{sidebar}}",     sidebar);
 
     std::ofstream out(config.outputDir + "/index.html");
     out << tpl;

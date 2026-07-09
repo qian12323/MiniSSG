@@ -144,26 +144,30 @@ std::string extractExcerpt(const std::string& raw)
     std::string excerpt;
     while (std::getline(stream, line))
     {
-        if (line.empty()) { if (!excerpt.empty()) break; continue; }
-        if (line[0] == '#') continue;
-        if (line[0] == '!' && line.size() > 1 && line[1] == '[') continue;
-        if (line[0] == '|') continue;  // 跳过表格
+        if (line.empty()) continue;
+        if (line[0] == '#')
+        {
+            if (!excerpt.empty()) break;
+            continue;
+        }
+        if (line[0] == '|') continue;
         if (!excerpt.empty()) excerpt += " ";
+        // 只取纯文本，跳过图片和链接中的 URL
+        if (line[0] == '!' && line.size() > 1 && line[1] == '[') continue;
         excerpt += line;
-        if (excerpt.size() > 150) break;
+        if (excerpt.size() > 1200) break;
     }
 
-    // 清理 markdown 格式
     auto strip = [](std::string& s, const std::string& pat) {
         size_t p = 0;
         while ((p = s.find(pat, p)) != std::string::npos) s.erase(p, pat.size());
     };
-    strip(excerpt, "**"); strip(excerpt, "__");
+    strip(excerpt, "**"); strip(excerpt, "__"); strip(excerpt, "~~");
     strip(excerpt, "`"); strip(excerpt, "*");
 
-    if (excerpt.size() > 150)
+    if (excerpt.size() > 1180)
     {
-        excerpt = excerpt.substr(0, 147);
+        excerpt = excerpt.substr(0, 877);
         auto pos = excerpt.rfind(' ');
         if (pos != std::string::npos) excerpt = excerpt.substr(0, pos);
         excerpt += "...";
