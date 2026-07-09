@@ -64,6 +64,7 @@ void build(const SiteConfig& config, bool fixHeadings, bool autoNumber)
         auto html = renderPost(art, postTpl);
         replace(html, "{{siteTitle}}", config.title);
         replace(html, "{{autoNumber}}", autoNumber ? "true" : "false");
+        replace(html, "{{category}}", art.category);
 
         std::ofstream out(outPath);
         out << html;

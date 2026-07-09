@@ -30,7 +30,8 @@ static bool isProtected(const std::string& rel)
         || rel == "tags.html"
         || rel == "categories.html"
         || rel.rfind("tags/", 0) == 0
-        || rel.rfind("categories/", 0) == 0;
+        || rel.rfind("categories/", 0) == 0
+        || rel.rfind("assets/", 0) == 0;
 }
 
 void cmdClean(bool dryRun, const std::string& configPath)

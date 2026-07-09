@@ -29,8 +29,14 @@ MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]}};
 <article class="post-article">
   <div class="article-head">
     <h1>{{title}}</h1>
-    <time>{{date}}</time>
-    <div class="tags">Tags: {{tags}}</div>
+    <div class="meta-bar">
+      <div class="meta-left">
+        <span>📅 <time>{{date}}</time></span>
+        <span class="meta-sep">·</span>
+        <span>🗂️ 分类: <a href="/categories/{{category}}.html">{{category}}</a></span>
+      </div>
+      <div class="meta-tags">{{tags}}</div>
+    </div>
   </div>
   <div class="content">{{content}}</div>
 </article>
@@ -50,5 +56,11 @@ MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]}};
 <script src="/assets/theme.js"></script>
 <script src="/assets/toc.js"></script>
 <script>hljs.highlightAll();</script>
+<script>
+(function(){
+  var t=document.querySelector('.meta-tags');
+  if(t){var tags=t.textContent.split(/,\s*/);var h='';tags.forEach(function(x){h+='<a href=\"/tags/'+x+'.html\" class=\"tag-pill\">'+x+'</a>'});t.innerHTML=h;}
+})();
+</script>
 </body>
 </html>
