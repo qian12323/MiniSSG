@@ -83,6 +83,7 @@ std::string okHeader(const std::string& mime, size_t size)
     return "HTTP/1.1 200 OK\r\n"
            "Content-Type: " + mime + "\r\n"
            "Content-Length: " + std::to_string(size) + "\r\n"
+           "Cache-Control: no-cache\r\n"
            "Connection: close\r\n\r\n";
 }
 

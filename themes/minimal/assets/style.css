@@ -115,6 +115,19 @@ main { max-width:800px; margin:32px auto; padding:0 18px; }
 .side-card a:hover { color:var(--link); }
 .side-card li span { color:var(--text-muted); font-size:11px; margin-left:4px; }
 
+/* ===== Filter card ===== */
+.filter-card { padding:14px 16px; }
+.filter-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.filter-head h3 { margin:0; }
+.filter-reset { background:none; border:1px solid var(--border); color:var(--text-muted); font-size:14px; padding:1px 8px; border-radius:4px; cursor:pointer; line-height:1.4; }
+.filter-reset:hover { color:var(--text); }
+.filter-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin:8px 0 4px; }
+.filter-graph { height:180px; background:var(--bg-alt); border-radius:6px; }
+.filter-cats { display:flex; flex-wrap:wrap; gap:5px; padding:4px 0; }
+.fc-item { display:inline-block; border-radius:4px; cursor:pointer; color:var(--text); font-size:12px; border:1px solid var(--border); transition:all 0.15s; user-select:none; }
+.fc-item:hover { border-color:var(--link); }
+.fc-active { background:var(--link); color:#fff; border-color:var(--link); }
+
 /* ===== Heatmap ===== */
 .heatmap { margin-top:16px; }
 .hm-header { display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--text-muted); margin-bottom:8px; }

@@ -108,6 +108,34 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
     cntJson += "}";
     replace(tpl, "{{postCounts}}", cntJson);
 
+    // 过滤图谱数据：标签关系 + 分类词云
+    std::string tagGraph = "{\"nodes\":[";
+    bool firstTag = true;
+    for (auto& [tag, n] : tagMap)
+    {
+        if (!firstTag) tagGraph += ","; firstTag = false;
+        tagGraph += "{\"id\":\"" + tag + "\",\"count\":" + std::to_string(n) + "}";
+    }
+    tagGraph += "],\"edges\":[";
+    firstTag = true;
+    for (auto& a : articles)
+        for (size_t i = 0; i < a.tags.size(); ++i)
+            for (size_t j = i+1; j < a.tags.size(); ++j) {
+                if (!firstTag) tagGraph += ","; firstTag = false;
+                tagGraph += "{\"source\":\"" + a.tags[i] + "\",\"target\":\"" + a.tags[j] + "\"}";
+            }
+    tagGraph += "]}";
+    replace(tpl, "{{filterTagGraph}}", tagGraph);
+
+    std::string catCloud = "[";
+    bool firstCat = true;
+    for (auto& [cat, n] : cats) {
+        if (!firstCat) catCloud += ","; firstCat = false;
+        catCloud += "{\"id\":\"" + cat + "\",\"count\":" + std::to_string(n) + "}";
+    }
+    catCloud += "]";
+    replace(tpl, "{{filterCatCloud}}", catCloud);
+
     std::ofstream out(config.outputDir + "/index.html");
     out << tpl;
     std::cout << "Generated: " << config.outputDir << "/index.html" << std::endl;

@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{title}}</title>
 <link rel="stylesheet" href="/assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.6/dist/vis-network.min.js"></script>
 </head>
 <body>
 <header>
@@ -31,6 +32,19 @@
 
 <aside class="index-sidebar">
   {{sidebar}}
+
+  <div class="side-card filter-card">
+    <div class="filter-head">
+      <h3>过滤</h3>
+      <button class="filter-reset" id="filterReset">↺</button>
+    </div>
+
+    <div class="filter-label">Tags</div>
+    <div id="filter-graph" class="filter-graph"></div>
+
+    <div class="filter-label">Categories</div>
+    <div id="filter-cats" class="filter-cats"></div>
+  </div>
 </aside>
 </main>
 
@@ -41,6 +55,8 @@
 <script src="/assets/theme.js"></script>
 <script>window.__postDates={{postDates}};window.__postCounts={{postCounts}};</script>
 <script src="/assets/heatmap.js"></script>
+<script>window.__filterTagGraph={{filterTagGraph}};window.__filterCatCloud={{filterCatCloud}};</script>
+<script src="/assets/filter.js"></script>
 <script>
 (function(){
   document.querySelectorAll('.card-tags').forEach(function(t){
