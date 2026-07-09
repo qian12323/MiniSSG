@@ -42,7 +42,7 @@ int run(int argc, char* argv[])
     buildCmd->add_option("--fix-headings-number", cfg.autoNumber, "Auto-number headings (yes/no)");
     buildCmd->callback([&] { cmdBuild(configPath, cfg.fixHeadings, cfg.autoNumber); });
 
-    auto* newCmd = app.add_subcommand("new", "Create a new post");
+    auto* newCmd = app.add_subcommand("new", "Create a new post")->alias("n");
     std::string title;
     std::string category = "other";
     newCmd->add_option("title", title, "Post title")->required();

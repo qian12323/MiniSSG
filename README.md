@@ -9,7 +9,7 @@
 minissg ns -n myblog && cd myblog
 
 # 写文章
-minissg new "我的第一篇文章"
+minissg n "我的第一篇文章"
 
 # 构建
 minissg b
@@ -41,7 +41,7 @@ minissg r -p 8080
 | 命令 | 缩写 | 说明 |
 |------|------|------|
 | `build` | `b` | 构建站点 |
-| `new "标题"` | — | 新建文章，`--categ` 指定分类 |
+| `new "标题"` | `n` | 新建文章，`--categ` 指定分类 |
 | `run` | `r` | 启动本地服务器，`-p` 指定端口 |
 | `clean` | `c` | 清理孤儿文件，`-n` 试运行 |
 | `newsite` | `ns` | 新建站点目录，`-n` 指定名称 |
