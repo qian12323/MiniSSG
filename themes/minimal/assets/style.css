@@ -154,8 +154,14 @@ html[data-theme="dark"] .hm-l4 { background:#39d353; }
 .card-cover-empty::before { content:'暂无封面'; }
 
 /* ===== page: tags / categories summary ===== */
-.page-head { background:var(--bg); padding:36px 40px; border-radius:10px; box-shadow:var(--shadow); margin-bottom:24px; }
+.page-head { background:var(--bg); padding:36px 40px 24px; border-radius:10px; box-shadow:var(--shadow); margin-bottom:24px; }
 .page-head h1 { font-size:1.5em; }
+.tag-graph-wrap { position:relative; }
+.tag-graph { margin-top:12px; background:var(--bg-alt); border-radius:8px; border:1px solid var(--border); height:420px; width:100%; }
+.graph-ctrl { position:absolute; bottom:8px; right:8px; display:flex; gap:4px; z-index:5; }
+.gbtn { padding:3px 10px; font-size:14px; border:1px solid var(--border); border-radius:4px; background:var(--bg); color:var(--text); cursor:pointer; opacity:0.85; }
+.gbtn { padding:3px 10px; font-size:14px; border:1px solid var(--border); border-radius:4px; background:var(--bg); color:var(--text); cursor:pointer; opacity:0.85; }
+.gbtn:hover { opacity:1; }
 .tag-group, .cat-group { background:var(--bg); border-radius:10px; box-shadow:var(--shadow); padding:24px 40px; margin-bottom:20px; }
 .tag-group h2, .cat-group h2 { font-size:1.1em; color:var(--link); }
 .tag-group h2 a, .cat-group h2 a { color:var(--link); text-decoration:none; }
@@ -167,6 +173,8 @@ html[data-theme="dark"] .hm-l4 { background:#39d353; }
 .tag-group li a:hover, .cat-group li a:hover { color:var(--link); }
 .view-all { padding:8px 0 0 40px; }
 .view-all a { color:var(--link); font-size:13px; }
+
+.index-card.filtered, .tag-group.filtered, .view-all.filtered { display:none; }
 
 /* ===== page: tag/category detail ===== */
 .posts-list { background:var(--bg); border-radius:10px; box-shadow:var(--shadow); overflow:hidden; }

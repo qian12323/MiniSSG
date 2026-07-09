@@ -128,8 +128,34 @@ void buildTags(const std::vector<Article>& articles, const SiteConfig& config)
         out << detail;
     }
 
-    replace(tagsTpl, "{{title}}",  config.title);
-    replace(tagsTpl, "{{groups}}", summary);
+    // 标签关系图谱数据
+    std::string graphJson = "{\"nodes\":[";
+    bool firstNode = true;
+    for (auto& [tag, vec] : tagMap)
+    {
+        if (!firstNode) graphJson += ",";
+        firstNode = false;
+        graphJson += "{\"id\":\"" + tag + "\",\"count\":" + std::to_string(vec.size()) + "}";
+    }
+    graphJson += "],\"edges\":[";
+    bool firstEdge = true;
+    for (auto& a : articles)
+    {
+        for (size_t i = 0; i < a.tags.size(); ++i)
+        {
+            for (size_t j = i + 1; j < a.tags.size(); ++j)
+            {
+                if (!firstEdge) graphJson += ",";
+                firstEdge = false;
+                graphJson += "{\"source\":\"" + a.tags[i] + "\",\"target\":\"" + a.tags[j] + "\"}";
+            }
+        }
+    }
+    graphJson += "]}";
+
+    replace(tagsTpl, "{{title}}",     config.title);
+    replace(tagsTpl, "{{groups}}",    summary);
+    replace(tagsTpl, "{{graphData}}", graphJson);
 
     std::ofstream out(config.outputDir + "/tags.html");
     out << tagsTpl;

@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tags - {{title}}</title>
 <link rel="stylesheet" href="/assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.6/dist/vis-network.min.js"></script>
 </head>
 <body>
 <header>
@@ -21,6 +22,14 @@
 <main>
 <div class="page-head">
   <h1>Tags</h1>
+  <div class="tag-graph-wrap">
+    <div id="tag-graph" class="tag-graph"></div>
+    <div class="graph-ctrl">
+      <button class="gbtn" id="gfit">↺</button>
+      <button class="gbtn" id="gout">−</button>
+      <button class="gbtn" id="gin">+</button>
+    </div>
+  </div>
 </div>
 {{groups}}
 </main>
@@ -30,6 +39,8 @@
 </footer>
 
 <script src="/assets/theme.js"></script>
+<script>window.__graphData={{graphData}};</script>
+<script src="/assets/graph.js"></script>
 <script>
 (function(){
   document.querySelectorAll('.card-tags').forEach(function(t){
