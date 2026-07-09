@@ -84,6 +84,30 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
     replace(tpl, "{{posts}}",       list);
     replace(tpl, "{{sidebar}}",     sidebar);
 
+    // 日期数据供 heatmap 使用
+    std::map<std::string, int> dateCounts;
+    for (auto& a : articles) dateCounts[a.date]++;
+
+    std::string dates = "[";
+    for (size_t i = 0; i < articles.size(); ++i)
+    {
+        if (i > 0) dates += ",";
+        dates += "\"" + articles[i].date + "\"";
+    }
+    dates += "]";
+    replace(tpl, "{{postDates}}", dates);
+
+    std::string cntJson = "{";
+    bool first = true;
+    for (auto& [d, n] : dateCounts)
+    {
+        if (!first) cntJson += ",";
+        first = false;
+        cntJson += "\"" + d + "\":" + std::to_string(n);
+    }
+    cntJson += "}";
+    replace(tpl, "{{postCounts}}", cntJson);
+
     std::ofstream out(config.outputDir + "/index.html");
     out << tpl;
     std::cout << "Generated: " << config.outputDir << "/index.html" << std::endl;

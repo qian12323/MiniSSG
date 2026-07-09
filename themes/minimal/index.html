@@ -23,6 +23,7 @@
 <div class="hero">
   <h1>{{title}}</h1>
   <p>{{description}}</p>
+  <div id="heatmap" class="heatmap"></div>
 </div>
 
 {{posts}}
@@ -38,6 +39,8 @@
 </footer>
 
 <script src="/assets/theme.js"></script>
+<script>window.__postDates={{postDates}};window.__postCounts={{postCounts}};</script>
+<script src="/assets/heatmap.js"></script>
 <script>
 (function(){
   document.querySelectorAll('.card-tags').forEach(function(t){
