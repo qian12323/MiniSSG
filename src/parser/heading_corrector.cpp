@@ -104,6 +104,8 @@ std::string correctHeadings(const std::string& html, const std::string& filePath
             for (int i = h.newLvl; i < 6; ++i) cnt[i] = 0;
             cnt[h.newLvl - 1]++;
 
+            if (h.newLvl > 3) continue;  // 只编号到三级标题
+
             std::string num;
             for (int i = 0; i < h.newLvl; ++i)
             {
