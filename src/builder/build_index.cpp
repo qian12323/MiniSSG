@@ -70,8 +70,11 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
 
     std::string sidebar;
     sidebar += "<div class=\"side-card\"><h3>分类</h3><ul>";
-    for (auto& [c, n] : cats)
-        sidebar += "<li><a href=\"/categories/" + c + ".html\">" + c + "</a> <span>(" + std::to_string(n) + ")</span></li>";
+    std::vector<std::string> catOrder;
+    for (auto& [c, n] : cats) if (c != "other") catOrder.push_back(c);
+    if (cats.count("other")) catOrder.push_back("other");
+    for (auto& c : catOrder)
+        sidebar += "<li><a href=\"/categories/" + c + ".html\">" + c + "</a> <span>(" + std::to_string(cats[c]) + ")</span></li>";
     sidebar += "</ul></div>";
 
     sidebar += "<div class=\"side-card\"><h3>标签</h3><ul>";
