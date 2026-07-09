@@ -5,7 +5,7 @@
 namespace minissg
 {
 
-std::string correctHeadings(const std::string& html, const std::string& filePath,
-                            bool autoNumber = true);
+std::string correctHeadings(const std::string& html, const std::string& rawBody,
+                            const std::string& filePath, bool autoNumber = true);
 
 } // namespace minissg

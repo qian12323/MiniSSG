@@ -4,6 +4,7 @@
 #include <regex>
 #include <vector>
 #include <string>
+#include <sstream>
 
 namespace minissg
 {
@@ -25,17 +26,19 @@ struct HeadingInfo
     std::string number;  // 编号前缀，如 "2.1. "
 };
 
-void warnSkip(const std::string& path, int from, int to)
+void warnSkip(const std::string& path, int from, int to, int lineNo)
 {
     std::cerr << C_WARN << "Warning: " << C_RESET << path
+              << ":" << lineNo
               << " - heading skips from H" << from
               << " to H" << to
               << ", missing H" << (from + 1) << "\n";
 }
 
-void warnRestart(const std::string& path, int newLvl, int prevStart)
+void warnRestart(const std::string& path, int newLvl, int prevStart, int lineNo)
 {
     std::cerr << C_WARN << "Warning: " << C_RESET << path
+              << ":" << lineNo
               << " - hierarchy restarts from H" << newLvl
               << " after previous section started at H"
               << prevStart << "\n";
@@ -43,8 +46,25 @@ void warnRestart(const std::string& path, int newLvl, int prevStart)
 
 } // anonymous namespace
 
-std::string correctHeadings(const std::string& html, const std::string& filePath, bool autoNumber)
+std::string correctHeadings(const std::string& html, const std::string& rawBody,
+                            const std::string& filePath, bool autoNumber)
 {
+    // 从原始 markdown body 提取标题行号
+    std::regex mdHdr("^#{1,6}\\s");
+    std::vector<int> lineNums;
+    {
+        int lineNo = 0;
+        std::istringstream stream(rawBody);
+        std::string line;
+        while (std::getline(stream, line))
+        {
+            ++lineNo;
+            if (std::regex_search(line, mdHdr))
+                lineNums.push_back(lineNo);
+        }
+    }
+
+    // HTML 标题提取
     std::regex reOpen("<h([1-6])(?:\\s[^>]*)?>");
     std::vector<HeadingInfo> hs;
 
@@ -77,11 +97,13 @@ std::string correctHeadings(const std::string& html, const std::string& filePath
     {
         if (hs[i].rawLvl >= hs[i-1].rawLvl)
         {
-            ++curLvl;
+            if (hs[i].rawLvl > hs[i-1].rawLvl)
+                ++curLvl;
             hs[i].newLvl = std::min(6, curLvl);
 
             if (hs[i].rawLvl - hs[i-1].rawLvl > 1)
-                warnSkip(filePath, hs[i-1].rawLvl, hs[i].rawLvl);
+                warnSkip(filePath, hs[i-1].rawLvl, hs[i].rawLvl,
+                         i < lineNums.size() ? lineNums[i] : 0);
         }
         else
         {
@@ -89,7 +111,8 @@ std::string correctHeadings(const std::string& html, const std::string& filePath
             hs[i].newLvl = 1;
 
             if (hs[i].rawLvl < prevFragStart)
-                warnRestart(filePath, hs[i].rawLvl, prevFragStart);
+                warnRestart(filePath, hs[i].rawLvl, prevFragStart,
+                            i < lineNums.size() ? lineNums[i] : 0);
 
             prevFragStart = hs[i].rawLvl;
         }

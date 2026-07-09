@@ -46,7 +46,7 @@ void build(const SiteConfig& config, bool fixHeadings, bool autoNumber)
 
         auto art = parseArticle(path);
         if (fixHeadings)
-            art.htmlContent = correctHeadings(art.htmlContent, path, autoNumber);
+            art.htmlContent = correctHeadings(art.htmlContent, art.rawContent, path, autoNumber);
 
         // 从相对路径提取分类目录名
         std::string rel = fs::relative(entry.path(), srcRoot).string();
@@ -80,6 +80,22 @@ void build(const SiteConfig& config, bool fixHeadings, bool autoNumber)
     buildIndex(articles, config);
     buildTags(articles, config);
     buildCategories(articles, config);
+
+    // 3. 复制主题静态资源（非 .html 文件）
+    fs::path themeDir = config.themeDir;
+    if (fs::exists(themeDir))
+    {
+        for (auto& entry : fs::recursive_directory_iterator(themeDir))
+        {
+            if (!entry.is_regular_file() || entry.path().extension() == ".html")
+                continue;
+            std::string rel = fs::relative(entry.path(), themeDir).string();
+            std::string outPath = config.outputDir + "/" + rel;
+            fs::create_directories(fs::path(outPath).parent_path());
+            fs::copy_file(entry.path(), outPath,
+                          fs::copy_options::overwrite_existing);
+        }
+    }
 }
 
 } // namespace minissg
