@@ -100,12 +100,21 @@ void cmdClean(bool dryRun, const std::string& configPath)
         }
     }
 
-    // 清理空目录
-    for (auto& entry : fs::recursive_directory_iterator(out, fs::directory_options::none))
+    // 清理空目录（倒序删除，避免迭代器失效）
+    if (!dryRun)
     {
-        if (entry.is_directory() && fs::is_empty(entry.path()))
+        std::vector<fs::path> emptyDirs;
+        for (auto& entry : fs::recursive_directory_iterator(out))
         {
-            // 延迟到下一轮迭代删除，避免迭代器失效
+            if (entry.is_directory() && fs::is_empty(entry.path())
+                && !isProtected(fs::relative(entry.path(), outRoot).string()))
+                emptyDirs.push_back(entry.path());
+        }
+        std::sort(emptyDirs.rbegin(), emptyDirs.rend());
+        for (auto& d : emptyDirs)
+        {
+            fs::remove(d);
+            std::cout << "Removed empty dir: " << fs::relative(d, outRoot).string() << "\n";
         }
     }
 
