@@ -158,12 +158,14 @@ html[data-theme="dark"] .hm-l4 { background:#39d353; }
 .page-head h1 { font-size:1.5em; }
 .tag-group, .cat-group { background:var(--bg); border-radius:10px; box-shadow:var(--shadow); padding:24px 40px; margin-bottom:20px; }
 .tag-group h2, .cat-group h2 { font-size:1.1em; color:var(--link); }
+.tag-group h2 a, .cat-group h2 a { color:var(--link); text-decoration:none; }
+.tag-group h2 a:hover, .cat-group h2 a:hover { text-decoration:underline; }
 .tag-count, .cat-count { color:var(--text-muted); font-size:0.85em; font-weight:normal; }
 .tag-group ul, .cat-group ul { list-style:none; padding:8px 0 0; }
 .tag-group li, .cat-group li { padding:4px 0; font-size:15px; }
 .tag-group li a, .cat-group li a { color:var(--text); text-decoration:none; }
 .tag-group li a:hover, .cat-group li a:hover { color:var(--link); }
-.view-all { list-style:none; padding-top:6px; }
+.view-all { padding:8px 0 0 40px; }
 .view-all a { color:var(--link); font-size:13px; }
 
 /* ===== page: tag/category detail ===== */

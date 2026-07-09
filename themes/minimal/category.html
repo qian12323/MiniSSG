@@ -23,9 +23,7 @@
   <h1>Categories / {{category}}</h1>
 </div>
 
-<ul class="posts-list">
 {{posts}}
-</ul>
 
 <div class="back-link">
   <a href="/categories.html">← Back to Categories</a>
@@ -37,5 +35,13 @@
 </footer>
 
 <script src="/assets/theme.js"></script>
+<script>
+(function(){
+  document.querySelectorAll('.card-tags').forEach(function(t){
+    var tags=t.textContent.split(/,\s*/).filter(Boolean);
+    var h=''; tags.forEach(function(x){h+='<a href=\"/tags/'+x+'.html\" class=\"tag-pill\">'+x+'</a>'});t.innerHTML=h;
+  });
+})();
+</script>
 </body>
 </html>
