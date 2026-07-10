@@ -18,11 +18,27 @@
   </nav>
 </header>
 
-<main>
+<main class="index-main">
+<div class="index-content">
 <div class="page-head">
   <h1>Categories</h1>
+  <div id="cat-graph" class="cat-graph">
+    <div class="graph-ctrl">
+      <button class="gbtn" id="cg-fit">↺</button>
+      <button class="gbtn" id="cg-out">−</button>
+      <button class="gbtn" id="cg-in">+</button>
+    </div>
+  </div>
 </div>
 {{groups}}
+</div>
+
+<aside class="index-sidebar">
+  <div class="side-card">
+    <h3>Categories tree</h3>
+    <div id="cat-tree" class="cat-tree"></div>
+  </div>
+</aside>
 </main>
 
 <footer>
@@ -30,6 +46,9 @@
 </footer>
 
 <script src="/assets/theme.js"></script>
+<script>window.__catTree={{treeData}};</script>
+<script src="/assets/cat-tree.js"></script>
+<script src="/assets/tree.js"></script>
 <script>
 (function(){
   document.querySelectorAll('.card-tags').forEach(function(t){

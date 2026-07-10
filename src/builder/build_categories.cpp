@@ -5,6 +5,8 @@
 #include <iostream>
 #include <map>
 #include <filesystem>
+#include <functional>
+#include <algorithm>
 
 #include "renderer/renderer.h"
 
@@ -119,6 +121,57 @@ void buildCategories(const std::vector<Article>& articles, const SiteConfig& con
 
     replace(categoriesTpl, "{{title}}",  config.title);
     replace(categoriesTpl, "{{groups}}", summary);
+
+    // 目录树数据（包含中间路径）
+    std::map<std::string, std::vector<std::string>> treeMap;
+    for (auto& [cat, vec] : catMap)
+    {
+        std::string cur = cat;
+        while (!cur.empty())
+        {
+            auto sep = cur.rfind('/');
+            std::string parent = (sep != std::string::npos) ? cur.substr(0, sep) : "";
+            auto& children = treeMap[parent];
+            if (std::find(children.begin(), children.end(), cur) == children.end())
+                children.push_back(cur);
+            cur = parent;
+        }
+    }
+    // 递归计数
+    std::function<int(const std::string&)> recursiveCount = [&](const std::string& path) -> int {
+        int sum = 0;
+        if (catMap.count(path)) sum += catMap[path].size();
+        if (treeMap.count(path))
+            for (auto& c : treeMap[path]) sum += recursiveCount(c);
+        return sum;
+    };
+
+    // 生成树 JSON（递归）
+    std::function<std::string(const std::string&)> buildTree = [&](const std::string& root) -> std::string {
+        std::string js = "[";
+        bool first = true;
+        if (treeMap.count(root))
+        {
+            std::sort(treeMap[root].begin(), treeMap[root].end());
+            for (auto& child : treeMap[root])
+            {
+                if (!first) js += ","; first = false;
+                std::string name = (root.empty()) ? child : child.substr(root.size() + 1);
+                bool isLeaf = catMap.count(child) > 0;
+                int count = recursiveCount(child);
+                js += "{\"name\":\"" + name + "\",\"path\":\"" + child + "\",\"count\":" + std::to_string(count) + ",\"leaf\":" + (isLeaf ? "true" : "false");
+                if (treeMap.count(child))
+                    js += ",\"children\":" + buildTree(child);
+                else
+                    js += ",\"children\":[]";
+                js += "}";
+            }
+        }
+        js += "]";
+        return js;
+    };
+    std::string treeData = buildTree("");
+    replace(categoriesTpl, "{{treeData}}", treeData);
 
     std::ofstream out(config.outputDir + "/categories.html");
     out << categoriesTpl;
