@@ -55,9 +55,9 @@ void cmdClean(bool dryRun, const std::string& configPath)
             {
                 // .md 文件 → output/{category}/{slug}.html
                 std::string slug = extractSlug(entry.path().filename().string());
-                auto sep = rel.find('/');
-                std::string category = (sep != std::string::npos)
-                    ? rel.substr(0, sep) : "other";
+                auto lastSep = rel.rfind('/');
+                std::string category = (lastSep != std::string::npos)
+                    ? rel.substr(0, lastSep) : "other";
                 expected.insert(category + "/" + slug + ".html");
             }
             else

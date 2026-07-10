@@ -9,6 +9,12 @@ std::string articleLink(const Article& a)
     return "<a href=\"/" + href + "\">" + a.title + "</a>";
 }
 
+std::string leafName(const std::string& path)
+{
+    auto pos = path.rfind('/');
+    return (pos != std::string::npos) ? path.substr(pos + 1) : path;
+}
+
 void replace(std::string& tpl, const std::string& key, const std::string& val)
 {
     size_t pos = 0;

@@ -39,7 +39,7 @@ void buildCategories(const std::vector<Article>& articles, const SiteConfig& con
         int total = static_cast<int>(vec.size());
 
         summary += "<div class=\"cat-group\">\n"
-                   "<h2><a href=\"/categories/" + cat + ".html\">" + cat + "</a> <span class=\"cat-count\">("
+                   "<h2><a href=\"/categories/" + cat + ".html\">" + leafName(cat) + "</a> <span class=\"cat-count\">("
                    + std::to_string(total) + ")</span></h2>\n";
 
         int shown = std::min(total, 2);
@@ -53,7 +53,7 @@ void buildCategories(const std::vector<Article>& articles, const SiteConfig& con
                 summary += "<p class=\"card-excerpt\">" + a.excerpt + "</p>";
             summary += "<div class=\"card-footer\">"
                         "<span>🗂️ 分类: <a href=\"/categories/"
-                      + a.category + ".html\">" + a.category + "</a></span>";
+                      + a.category + ".html\">" + leafName(a.category) + "</a></span>";
             std::string ts;
             for (size_t j = 0; j < a.tags.size(); ++j) {
                 if (j > 0) ts += ", ";
@@ -87,7 +87,7 @@ void buildCategories(const std::vector<Article>& articles, const SiteConfig& con
                 postsHtml += "<p class=\"card-excerpt\">" + a.excerpt + "</p>";
             postsHtml += "<div class=\"card-footer\">"
                         "<span>🗂️ 分类: <a href=\"/categories/"
-                      + a.category + ".html\">" + a.category + "</a></span>";
+                      + a.category + ".html\">" + leafName(a.category) + "</a></span>";
             std::string ts;
             for (size_t j = 0; j < a.tags.size(); ++j) {
                 if (j > 0) ts += ", ";
@@ -111,8 +111,9 @@ void buildCategories(const std::vector<Article>& articles, const SiteConfig& con
         replace(detail, "{{posts}}",      postsHtml);
 
         std::string dir = config.outputDir + "/categories";
-        fs::create_directories(dir);
-        std::ofstream out(dir + "/" + cat + ".html");
+        std::string path = dir + "/" + cat + ".html";
+        fs::create_directories(fs::path(path).parent_path());
+        std::ofstream out(path);
         out << detail;
     }
 

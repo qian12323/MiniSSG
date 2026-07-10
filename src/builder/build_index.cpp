@@ -31,7 +31,7 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
 
         list += "<div class=\"card-footer\">"
                 "<span>🗂️ 分类: <a href=\"/categories/"
-              + a.category + ".html\">" + a.category + "</a></span>";
+              + a.category + ".html\">" + leafName(a.category) + "</a></span>";
 
         std::string tagStr;
         for (size_t j = 0; j < a.tags.size(); ++j)
@@ -74,7 +74,7 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
     for (auto& [c, n] : cats) if (c != "other") catOrder.push_back(c);
     if (cats.count("other")) catOrder.push_back("other");
     for (auto& c : catOrder)
-        sidebar += "<li><a href=\"/categories/" + c + ".html\">" + c + "</a> <span>(" + std::to_string(cats[c]) + ")</span></li>";
+        sidebar += "<li><a href=\"/categories/" + c + ".html\">" + leafName(c) + "</a> <span>(" + std::to_string(cats[c]) + ")</span></li>";
     sidebar += "</ul></div>";
 
     sidebar += "<div class=\"side-card\"><h3>标签</h3><ul>";
@@ -130,9 +130,22 @@ void buildIndex(const std::vector<Article>& articles, const SiteConfig& config)
     tagGraph += "]}";
     replace(tpl, "{{filterTagGraph}}", tagGraph);
 
+    // 词云数据：所有路径级别（递归计数，过滤空目录）
+    std::map<std::string, int> catRecursive;
+    for (auto& [cat, n] : cats)
+    {
+        std::string path = cat;
+        while (!path.empty())
+        {
+            catRecursive[path] += n;
+            auto sep = path.rfind('/');
+            if (sep == std::string::npos) break;
+            path = path.substr(0, sep);
+        }
+    }
     std::string catCloud = "[";
     bool firstCat = true;
-    for (auto& [cat, n] : cats) {
+    for (auto& [cat, n] : catRecursive) {
         if (!firstCat) catCloud += ","; firstCat = false;
         catCloud += "{\"id\":\"" + cat + "\",\"count\":" + std::to_string(n) + "}";
     }

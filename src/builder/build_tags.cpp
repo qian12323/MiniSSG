@@ -54,8 +54,8 @@ void buildTags(const std::vector<Article>& articles, const SiteConfig& config)
                 summary += "<p class=\"card-excerpt\">" + a.excerpt + "</p>";
 
             summary += "<div class=\"card-footer\">"
-                    "<span>🗂️ 分类: <a href=\"/categories/"
-                  + a.category + ".html\">" + a.category + "</a></span>";
+                        "<span>🗂️ 分类: <a href=\"/categories/"
+                      + a.category + ".html\">" + leafName(a.category) + "</a></span>";
 
             std::string tagStr;
             for (size_t j = 0; j < a.tags.size(); ++j)
@@ -99,7 +99,7 @@ void buildTags(const std::vector<Article>& articles, const SiteConfig& config)
                 postsHtml += "<p class=\"card-excerpt\">" + a.excerpt + "</p>";
             postsHtml += "<div class=\"card-footer\">"
                         "<span>🗂️ 分类: <a href=\"/categories/"
-                      + a.category + ".html\">" + a.category + "</a></span>";
+                      + a.category + ".html\">" + leafName(a.category) + "</a></span>";
             std::string ts;
             for (size_t j = 0; j < a.tags.size(); ++j) {
                 if (j > 0) ts += ", ";
@@ -123,8 +123,9 @@ void buildTags(const std::vector<Article>& articles, const SiteConfig& config)
         replace(detail, "{{posts}}",     postsHtml);
 
         std::string dir = config.outputDir + "/tags";
+        std::string path = dir + "/" + tag + ".html";
         fs::create_directories(dir);
-        std::ofstream out(dir + "/" + tag + ".html");
+        std::ofstream out(path);
         out << detail;
     }
 

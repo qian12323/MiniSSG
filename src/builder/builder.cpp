@@ -48,11 +48,11 @@ void build(const SiteConfig& config, bool fixHeadings, bool autoNumber)
         if (fixHeadings)
             art.htmlContent = correctHeadings(art.htmlContent, art.rawContent, path, autoNumber);
 
-        // 从相对路径提取分类目录名
+        // 从相对路径提取分类目录名（支持多级）
         std::string rel = fs::relative(entry.path(), srcRoot).string();
-        auto sep = rel.find('/');
-        if (sep != std::string::npos)
-            art.category = rel.substr(0, sep);
+        auto lastSep = rel.rfind('/');
+        if (lastSep != std::string::npos)
+            art.category = rel.substr(0, lastSep);
         else
             art.category = "other";
 
