@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Categories - {{title}}</title>
 <link rel="stylesheet" href="/assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.6/dist/vis-network.min.js"></script>
 </head>
 <body>
 <header>
@@ -22,7 +23,8 @@
 <div class="index-content">
 <div class="page-head">
   <h1>Categories</h1>
-  <div id="cat-graph" class="cat-graph">
+  <div class="cat-graph-wrap">
+    <div id="cat-graph" class="cat-graph"></div>
     <div class="graph-ctrl">
       <button class="gbtn" id="cg-fit">↺</button>
       <button class="gbtn" id="cg-out">−</button>

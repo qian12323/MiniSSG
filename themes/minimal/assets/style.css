@@ -134,8 +134,8 @@ main { max-width:800px; margin:32px auto; padding:0 18px; }
 
 .cat-tree { font-size:13px; }
 
-.cat-graph { margin:12px 0 0; background:var(--bg-alt); border-radius:8px 8px 0 0; border:1px solid var(--border); border-bottom:none; overflow-x:auto; position:relative; }
-.cat-graph svg { display:block; }
+.cat-graph-wrap { position:relative; }
+.cat-graph { margin:12px 0 0; background:var(--bg-alt); border-radius:8px; border:1px solid var(--border); height:260px; }
 .tree-list { list-style:none; padding:0; margin:0; }
 .tree-item { margin:0; }
 .tree-head { display:flex; align-items:center; gap:4px; padding:3px 0; cursor:pointer; }
