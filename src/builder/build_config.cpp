@@ -10,14 +10,17 @@ SiteConfig loadConfig(const std::string& path)
     SiteConfig cfg;
     YAML::Node root;
     try { root = YAML::LoadFile(path); }
-    catch (...) { return cfg; }
+    catch (...) { cfg.sourceDir = "posts"; cfg.outputDir = "output"; cfg.themeDir = "themes/minimal"; return cfg; }
 
     if (root["title"])       cfg.title       = root["title"].as<std::string>();
     if (root["description"]) cfg.description = root["description"].as<std::string>();
     if (root["baseUrl"])     cfg.baseUrl     = root["baseUrl"].as<std::string>();
     if (root["sourceDir"])   cfg.sourceDir   = root["sourceDir"].as<std::string>();
+    else                     cfg.sourceDir   = "posts";
     if (root["outputDir"])   cfg.outputDir   = root["outputDir"].as<std::string>();
+    else                     cfg.outputDir   = "output";
     if (root["themeDir"])    cfg.themeDir    = root["themeDir"].as<std::string>();
+    else                     cfg.themeDir    = "themes/minimal";
     if (root["fixHeadings"]) cfg.fixHeadings = root["fixHeadings"].as<bool>();
     if (root["autoNumber"])  cfg.autoNumber  = root["autoNumber"].as<bool>();
 

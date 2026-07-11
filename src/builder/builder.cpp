@@ -48,10 +48,22 @@ void build(const SiteConfig& config, bool fixHeadings, bool autoNumber)
         if (fixHeadings)
             art.htmlContent = correctHeadings(art.htmlContent, art.rawContent, path, autoNumber);
 
-        // 从相对路径提取分类目录名（支持多级）
+        // 从相对路径提取分类目录名（支持多级，过滤 fig-* 目录）
         std::string rel = fs::relative(entry.path(), srcRoot).string();
+        {
+            std::string filtered;
+            size_t start = 0, end;
+            while ((end = rel.find('/', start)) != std::string::npos)
+            {
+                std::string seg = rel.substr(start, end - start);
+                if (seg.size() < 4 || seg.substr(0, 4) != "fig-")
+                    filtered += seg + "/";
+                start = end + 1;
+            }
+            rel = filtered + rel.substr(start);
+        }
         auto lastSep = rel.rfind('/');
-        if (lastSep != std::string::npos)
+        if (lastSep != std::string::npos && lastSep > 0)
             art.category = rel.substr(0, lastSep);
         else
             art.category = "other";
