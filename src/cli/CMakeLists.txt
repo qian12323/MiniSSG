@@ -1,11 +1,15 @@
 # 编译期嵌入主题文件
 set(EMBED_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_theme.cpp)
+file(GLOB_RECURSE THEME_FILES
+    ${CMAKE_SOURCE_DIR}/themes/*
+)
 add_custom_command(
     OUTPUT ${EMBED_OUTPUT}
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/embed_theme.py
             ${CMAKE_SOURCE_DIR}
             ${EMBED_OUTPUT}
     DEPENDS ${CMAKE_SOURCE_DIR}/scripts/embed_theme.py
+            ${THEME_FILES}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Embedding theme files..."
 )

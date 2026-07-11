@@ -8,7 +8,9 @@ namespace minissg
 SiteConfig loadConfig(const std::string& path)
 {
     SiteConfig cfg;
-    YAML::Node root = YAML::LoadFile(path);
+    YAML::Node root;
+    try { root = YAML::LoadFile(path); }
+    catch (...) { return cfg; }
 
     if (root["title"])       cfg.title       = root["title"].as<std::string>();
     if (root["description"]) cfg.description = root["description"].as<std::string>();
