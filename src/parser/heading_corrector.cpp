@@ -1,5 +1,6 @@
 #include "parser/heading_corrector.h"
 
+#include <algorithm>
 #include <iostream>
 #include <regex>
 #include <vector>
@@ -32,7 +33,7 @@ void warnSkip(const std::string& path, int from, int to, int lineNo)
               << ":" << lineNo
               << " - heading skips from H" << from
               << " to H" << to
-              << ", missing H" << (from + 1) << "\n";
+               << ", missing H" << (std::min(from, to) + 1) << "\n";
 }
 
 void warnRestart(const std::string& path, int newLvl, int prevStart, int lineNo)
@@ -95,24 +96,33 @@ std::string correctHeadings(const std::string& html, const std::string& rawBody,
 
     for (size_t i = 1; i < hs.size(); ++i)
     {
-        if (hs[i].rawLvl >= hs[i-1].rawLvl)
+        if (hs[i].rawLvl > hs[i-1].rawLvl)
         {
-            if (hs[i].rawLvl > hs[i-1].rawLvl)
-                ++curLvl;
+            ++curLvl;
             hs[i].newLvl = std::min(6, curLvl);
 
             if (hs[i].rawLvl - hs[i-1].rawLvl > 1)
                 warnSkip(filePath, hs[i-1].rawLvl, hs[i].rawLvl,
                          i < lineNums.size() ? lineNums[i] : 0);
         }
+        else if (hs[i].rawLvl == hs[i-1].rawLvl)
+        {
+            hs[i].newLvl = std::min(6, curLvl);
+        }
         else
         {
-            curLvl = 1;
-            hs[i].newLvl = 1;
+            int diff = hs[i-1].rawLvl - hs[i].rawLvl;
+            curLvl = std::max(1, curLvl - diff);
+            hs[i].newLvl = std::min(6, curLvl);
 
-            if (hs[i].rawLvl < prevFragStart)
-                warnRestart(filePath, hs[i].rawLvl, prevFragStart,
-                            i < lineNums.size() ? lineNums[i] : 0);
+            if (diff > 1)
+            {
+                warnSkip(filePath, hs[i-1].rawLvl, hs[i].rawLvl,
+                         i < lineNums.size() ? lineNums[i] : 0);
+                if (hs[i].rawLvl < prevFragStart)
+                    warnRestart(filePath, hs[i].rawLvl, prevFragStart,
+                                i < lineNums.size() ? lineNums[i] : 0);
+            }
 
             prevFragStart = hs[i].rawLvl;
         }
