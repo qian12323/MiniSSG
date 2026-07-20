@@ -82,6 +82,38 @@ static void mdCallback(const MD_CHAR* text, MD_SIZE size, void* userdata)
     static_cast<std::string*>(userdata)->append(text, size);
 }
 
+// 转换 Obsidian wikilink：![[path]] → ![path](fig-{slug}/path)，[[path]] → [path](path)
+static std::string fixWikiLinks(const std::string& md, const std::string& slug)
+{
+    std::string r = md;
+    size_t pos = 0;
+    while ((pos = r.find("![[", pos)) != std::string::npos)
+    {
+        auto end = r.find("]]", pos + 3);
+        if (end == std::string::npos) break;
+        std::string path = r.substr(pos + 3, end - pos - 3);
+        std::string imgPath = path.find('/') == std::string::npos
+            ? "fig-" + slug + "/" + path : path;
+        std::string replacement = "![" + path + "](" + imgPath + ")";
+        r.replace(pos, end - pos + 2, replacement);
+        pos += replacement.size();
+    }
+    pos = 0;
+    while ((pos = r.find("[[", pos)) != std::string::npos)
+    {
+        if (pos > 0 && r[pos-1] == '!') { ++pos; continue; }
+        auto end = r.find("]]", pos + 2);
+        if (end == std::string::npos) break;
+        std::string link = r.substr(pos + 2, end - pos - 2);
+        auto pipe = link.rfind('|');
+        if (pipe != std::string::npos) link = link.substr(pipe + 1);
+        std::string replacement = "[" + link + "](" + link + ".md)";
+        r.replace(pos, end - pos + 2, replacement);
+        pos += replacement.size();
+    }
+    return r;
+}
+
 // URL 解码 %XX
 static std::string urlDecode(const std::string& s)
 {
@@ -200,6 +232,7 @@ Article parseArticle(const std::string& filePath)
     art = parseFrontmatter(fm);
     art.slug       = extractSlug(filePath);
     art.rawContent = body;
+    body = fixWikiLinks(body, art.slug);
     art.htmlContent = fixImageSrc(renderMarkdown(body));
     art.excerpt = extractExcerpt(body);
     art.coverImage = extractCoverImage(art.htmlContent);
