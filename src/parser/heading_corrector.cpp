@@ -25,6 +25,7 @@ struct HeadingInfo
     size_t closeLen;     // </hN> 长度
     int newLvl = 0;
     std::string number;  // 编号前缀，如 "2.1. "
+    bool noTouch = false;// 跳过修正和编号（如"参考文献"）
 };
 
 void warnSkip(const std::string& path, int from, int to, int lineNo)
@@ -90,34 +91,59 @@ std::string correctHeadings(const std::string& html, const std::string& rawBody,
 
     if (hs.empty()) return html;
 
-    hs[0].newLvl = 1;
-    int curLvl = 1;
-    int prevFragStart = hs[0].rawLvl;
-
-    for (size_t i = 1; i < hs.size(); ++i)
+    // 检测"参考文献"标题——跳过修正与编号，强制 H1
+    for (auto& h : hs)
     {
-        if (hs[i].rawLvl > hs[i-1].rawLvl)
+        size_t ts = h.blockStart + h.openLen;
+        size_t te = h.blockEnd - h.closeLen;
+        if (html.substr(ts, te - ts).find("参考文献") != std::string::npos)
+        {
+            h.noTouch = true;
+            h.newLvl = 1;
+        }
+    }
+
+    int curLvl = 1;
+    int firstReal = 0;
+    while (firstReal < (int)hs.size() && hs[firstReal].noTouch) ++firstReal;
+    int prevFragStart = firstReal < (int)hs.size() ? hs[firstReal].rawLvl : 1;
+
+    if (firstReal < (int)hs.size())
+    {
+        hs[firstReal].newLvl = 1;
+        curLvl = 1;
+    }
+
+    for (size_t i = (size_t)firstReal + 1; i < hs.size(); ++i)
+    {
+        if (hs[i].noTouch) continue;
+
+        // 找到前一个非 noTouch 标题
+        size_t prev = i;
+        do { if (prev == 0) break; --prev; } while (hs[prev].noTouch);
+
+        if (hs[i].rawLvl > hs[prev].rawLvl)
         {
             ++curLvl;
             hs[i].newLvl = std::min(6, curLvl);
 
-            if (hs[i].rawLvl - hs[i-1].rawLvl > 1)
-                warnSkip(filePath, hs[i-1].rawLvl, hs[i].rawLvl,
+            if (hs[i].rawLvl - hs[prev].rawLvl > 1)
+                warnSkip(filePath, hs[prev].rawLvl, hs[i].rawLvl,
                          i < lineNums.size() ? lineNums[i] : 0);
         }
-        else if (hs[i].rawLvl == hs[i-1].rawLvl)
+        else if (hs[i].rawLvl == hs[prev].rawLvl)
         {
             hs[i].newLvl = std::min(6, curLvl);
         }
         else
         {
-            int diff = hs[i-1].rawLvl - hs[i].rawLvl;
+            int diff = hs[prev].rawLvl - hs[i].rawLvl;
             curLvl = std::max(1, curLvl - diff);
             hs[i].newLvl = std::min(6, curLvl);
 
             if (diff > 1)
             {
-                warnSkip(filePath, hs[i-1].rawLvl, hs[i].rawLvl,
+                warnSkip(filePath, hs[prev].rawLvl, hs[i].rawLvl,
                          i < lineNums.size() ? lineNums[i] : 0);
                 if (hs[i].rawLvl < prevFragStart)
                     warnRestart(filePath, hs[i].rawLvl, prevFragStart,
@@ -134,6 +160,8 @@ std::string correctHeadings(const std::string& html, const std::string& rawBody,
         int cnt[6] = {0};
         for (auto& h : hs)
         {
+            if (h.noTouch) continue;
+
             for (int i = h.newLvl; i < 6; ++i) cnt[i] = 0;
             cnt[h.newLvl - 1]++;
 
@@ -156,6 +184,15 @@ std::string correctHeadings(const std::string& html, const std::string& rawBody,
     for (int i = static_cast<int>(hs.size()) - 1; i >= 0; --i)
     {
         auto& h = hs[i];
+        if (h.noTouch)
+        {
+            size_t ts = h.blockStart + h.openLen;
+            size_t te = h.blockEnd - h.closeLen;
+            std::string text = result.substr(ts, te - ts);
+            std::string block = "<h1>" + text + "</h1>";
+            result.replace(h.blockStart, h.blockEnd - h.blockStart, block);
+            continue;
+        }
         if (h.rawLvl == h.newLvl && h.number.empty()) continue;
 
         std::string newOpen = "<h" + std::to_string(h.newLvl) + ">";
